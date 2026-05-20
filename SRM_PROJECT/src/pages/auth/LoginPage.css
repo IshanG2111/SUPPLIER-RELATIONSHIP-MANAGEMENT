@@ -34,10 +34,10 @@
 
 /* ══ PAGE ══ */
 .auth-page {
-  position: relative; min-height: 100vh; display: flex;
+  position: relative; min-height: 100vh; height: 100vh; display: flex;
   align-items: center; justify-content: center;
   font-family: 'Inter', sans-serif; overflow: hidden;
-  padding: 16px;
+  padding: 0;
   background: var(--bg);
 }
 
@@ -45,7 +45,7 @@
 .auth-frame {
   position: relative; z-index: 10;
   width: 100%; max-width: 1300px;
-  min-height: 700px; max-height: 900px; height: 90vh;
+  min-height: 0; max-height: none; height: 100vh;
   border-radius: var(--r-frame);
   background: var(--surface);
   box-shadow: 0 30px 60px -15px rgba(0,0,0,0.15);
