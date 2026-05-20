@@ -82,13 +82,13 @@ export function GlobeGraphic() {
             </defs>
 
             {/* Subtle Equator and Grids */}
-            <g opacity="0.45">
-               <ellipse cx="200" cy="200" rx="160" ry="35" fill="none" stroke="#bae6fd" strokeWidth="1" />
-               <ellipse cx="200" cy="200" rx="160" ry="80" fill="none" stroke="#e0f2fe" strokeWidth="0.75" strokeDasharray="4 4" />
-               <ellipse cx="200" cy="200" rx="160" ry="120" fill="none" stroke="#e0f2fe" strokeWidth="0.5" strokeDasharray="2 4" />
-               <ellipse cx="200" cy="200" rx="35" ry="160" fill="none" stroke="#bae6fd" strokeWidth="0.75" />
-               <ellipse cx="200" cy="200" rx="80" ry="160" fill="none" stroke="#e0f2fe" strokeWidth="0.5" strokeDasharray="4 4" />
-               <ellipse cx="200" cy="200" rx="120" ry="160" fill="none" stroke="#e0f2fe" strokeWidth="0.5" strokeDasharray="2 4" />
+            <g opacity="0.4">
+               <ellipse cx="200" cy="200" rx="160" ry="35" fill="none" stroke="#7acaff" strokeWidth="1" />
+               <ellipse cx="200" cy="200" rx="160" ry="80" fill="none" stroke="#7ab1ff" strokeWidth="0.75" strokeDasharray="4 4" />
+               <ellipse cx="200" cy="200" rx="160" ry="120" fill="none" stroke="#7a92ff" strokeWidth="0.5" strokeDasharray="2 4" />
+               <ellipse cx="200" cy="200" rx="35" ry="160" fill="none" stroke="#7afbff" strokeWidth="0.75" />
+               <ellipse cx="200" cy="200" rx="80" ry="160" fill="none" stroke="#897aff" strokeWidth="0.5" strokeDasharray="4 4" />
+               <ellipse cx="200" cy="200" rx="120" ry="160" fill="none" stroke="#7acaff" strokeWidth="0.5" strokeDasharray="2 4" />
             </g>
 
             {/* Connections */}
@@ -106,13 +106,13 @@ export function GlobeGraphic() {
                    <motion.path d={pathD} fill="none" stroke="#eff6ff" strokeWidth="2.5"
                      initial={{ pathLength: 0, opacity: 0 }}
                      animate={{ pathLength: 1, opacity: [0, 1, 0] }}
-                     transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.4, ease: "easeInOut" }}
+                     transition={{ duration: 4.5, repeat: Infinity, delay: i * 0.8, ease: "easeInOut" }}
                      filter="url(#nodeGlowLight)"
                    />
                    <motion.path d={pathD} fill="none" stroke={n2.color} strokeWidth="1.5"
                      initial={{ pathLength: 0, opacity: 0 }}
                      animate={{ pathLength: 1, opacity: [0, 0.8, 0] }}
-                     transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.4 + 0.2, ease: "easeInOut" }}
+                     transition={{ duration: 3.5, repeat: Infinity, delay: i * 0.6 + 0.2, ease: "easeInOut" }}
                      filter="url(#nodeGlowLight)"
                    />
                  </g>
@@ -125,7 +125,7 @@ export function GlobeGraphic() {
                   <motion.circle cx={node.x} cy={node.y} r={node.r} fill="none" stroke={node.color} strokeWidth={2}
                     initial={{ scale: 1, opacity: 0.9 }}
                     animate={{ scale: [1, 3], opacity: [0.9, 0] }}
-                    transition={{ duration: 2.5, repeat: Infinity, delay: node.id * 0.3 }}
+                    transition={{ duration: 3.5, repeat: Infinity, delay: node.id * 0.3 }}
                   />
                   <circle cx={node.x} cy={node.y} r={node.r + 1.5} fill="#fff" filter="url(#nodeGlowLight)" />
                   <circle cx={node.x} cy={node.y} r={node.r} fill={node.color} />

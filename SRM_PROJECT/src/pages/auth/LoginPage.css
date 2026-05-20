@@ -150,12 +150,12 @@
   box-shadow: 0 8px 30px rgba(0,0,0,0.04);
   cursor: pointer; display: flex; flex-direction: column;
   position: relative; overflow: hidden;
-  transition: all .3s cubic-bezier(.4,0,.2,1);
+  transition: all .4s cubic-bezier(.4,0,.2,1);
 }
 .auth-role-card:hover {
   box-shadow: 0 20px 40px rgba(0,0,0,0.08);
   border-color: rgba(37,99,235,0.2);
-  transform: translateY(-4px);
+  transform: translateY(-6px);
 }
 .auth-role-card--active {
   border-color: var(--accent) !important;
@@ -167,7 +167,7 @@
 .auth-role-card::before {
   content: ''; position: absolute;
   top: 0; right: 0; width: 128px; height: 128px;
-  background: rgba(239,246,255,0.5);
+  background: rgba(239,246,255,0.8);
   border-radius: 0 0 0 100%;
   transform: translate(40px,-40px);
   transition: background .3s;
@@ -211,9 +211,11 @@
   display: flex; align-items: center; justify-content: center;
   border: 1px solid var(--border); color: var(--muted);
   position: relative; z-index: 1; transition: all .3s;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
 }
 .auth-role-card:hover .auth-role-card__arrow {
   border-color: var(--accent); background: var(--accent); color: white;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
 }
 
 /* ══ FORM INPUTS ══ */
@@ -282,7 +284,7 @@
 /* Security notice */
 .auth-security-notice {
   display: flex; align-items: center; gap: 10px;
-  padding: 14px 16px; background: #f8fafc;
+  padding: 14px 16px; background: #faf8fc;
   border: 1px solid var(--border);
   border-radius: 12px; font-size: 12px; color: var(--secondary);
   transition: all .2s;
@@ -313,8 +315,8 @@
 
 /* Bottom link */
 .auth-bottom-link { text-align: center; margin-top: 16px; font-size: 12px; color: var(--secondary) }
-.auth-bottom-link a { font-weight: 700; text-decoration: none; margin-left: 4px; transition: opacity .2s }
-.auth-bottom-link a:hover { opacity: .75 }
+.auth-bottom-link a { font-size:13px;font-weight: 700; text-decoration: none; margin-left: 4px; transition:opacity 0.3s ,color 0.4s ease-in-out}
+.auth-bottom-link a:hover { transform: scale(12px);opacity: .75; color: blue }
 
 /* Footer features row */
 .auth-footer-features {
