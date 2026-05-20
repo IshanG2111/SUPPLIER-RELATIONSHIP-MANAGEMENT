@@ -17,6 +17,9 @@ The portal utilizes a cutting-edge **split-pane glassmorphism design system** fe
 Here is the high-fidelity role-based landing page, allowing users to choose their appropriate portal:
 
 ![SRM Portal Role Selection Landing Page](SRM_PROJECT/public/images/role-selection.png)
+![SRM Portal Role Selection Login Page](SRM_PROJECT/public/images/login.png)
+![SRM Supplier Page](SRM_PROJECT/public/images/supplier.png)
+![SRM Admin Page](SRM_PROJECT/public/images/admin.png)
 
 ---
 
