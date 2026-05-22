@@ -10,12 +10,14 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.39.0",
     "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "latest",
     "recharts": "latest",
+    "tailwind-merge": "^3.6.0",
     "vite": "latest"
   },
   "devDependencies": {

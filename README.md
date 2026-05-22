@@ -13,6 +13,12 @@ Welcome to the **Supplier Relationship Management (SRM) Portal**, a state-of-the
 
 The portal utilizes a cutting-edge **split-pane glassmorphism design system** featuring vibrant, high-fidelity HSL gradients, organic light-fog glow effects, and complex SVG/motion-driven visualizations.
 
+### Recent Auth UI Updates
+The authentication experience now includes a cleaner registration flow and a more polished dark-mode treatment:
+*   **Multi-step Create Account Flow**: Registration now advances from account details to business/department details and then verification.
+*   **Custom Register Scrollbar**: The create-account panel uses a slim, branded scrollbar instead of the default browser style.
+*   **Dark Mode Badge Fixes**: Checkmark badges in the auth cards now keep the correct contrast in dark mode.
+
 ### Let's Get Started Landing Page
 Here is the high-fidelity role-based landing page, allowing users to choose their appropriate portal:
 
@@ -21,6 +27,10 @@ Here is the high-fidelity role-based landing page, allowing users to choose thei
 ![SRM Supplier Page](SRM_PROJECT/public/images/supplier.png)
 ![SRM Admin Page](SRM_PROJECT/public/images/admin.png)
 
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image.png)
 ---
 
 ## 🚀 Key Modules & Features
@@ -30,6 +40,7 @@ Here is the high-fidelity role-based landing page, allowing users to choose thei
 *   **Iridescent Globe Visualization**: An elegant, dynamic SVG globe animating interactive nodes and connection pulse lines on the presentation pane.
 *   **Transition Magic**: Powered by **Framer Motion** for springy role switches, interactive hover states, card lifting, and floating transitions.
 *   **Security Built-in**: Enterprise-grade secure input styling, "Remember Me" sessions, and Forgot Password recovery flows.
+*   **Guided Registration**: A step-by-step create-account flow that collects account details, business/department details, and verification in sequence.
 
 ### 2. 🚛 Supplier Portal
 A dedicated dashboard that empowers suppliers with end-to-end management of their business:
