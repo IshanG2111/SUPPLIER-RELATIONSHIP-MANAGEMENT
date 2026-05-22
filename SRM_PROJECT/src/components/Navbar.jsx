@@ -1,5 +1,6 @@
 import { Bell, Menu, Search, UserCircle } from 'lucide-react';
 import { Button } from './Button.jsx';
+import ThemeToggle from '../../../Theme.jsx';
 
 export function Navbar({ title, onMenu }) {
   return (
@@ -14,6 +15,7 @@ export function Navbar({ title, onMenu }) {
         </div>
       </div>
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         <div className="hidden w-64 items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 md:flex">
           <Search className="h-4 w-4" />
           Search suppliers, RFQs, POs
