@@ -1,6 +1,6 @@
 import { Bell, Menu, Search, UserCircle } from 'lucide-react';
 import { Button } from './Button.jsx';
-import ThemeToggle from '../../../Theme.jsx';
+import ThemeToggle from '../../Theme.jsx';
 
 export function Navbar({ title, onMenu }) {
   return (
