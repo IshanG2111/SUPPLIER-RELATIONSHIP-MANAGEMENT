@@ -8,11 +8,11 @@ import { currency } from '../../utils/formatters.js';
 export function SupplierOrders() {
   return (
     <>
-      <PageHeader title="Orders" description="Confirm, ship, and monitor purchase orders from buying organizations." />
+      <PageHeader title="Active Orders" description="View, confirm, ship, and track ongoing purchase orders." />
       <Card>
-        <CardHeader title="Order Queue" />
+        <CardHeader title="Active Order Queue" subtitle="Open POs that still require fulfillment updates" />
         <DataTable
-          data={purchaseOrders}
+          data={purchaseOrders.filter((order) => order.status !== 'Delivered')}
           columns={[
             { key: 'id', header: 'PO' },
             { key: 'supplier', header: 'Buyer Account' },

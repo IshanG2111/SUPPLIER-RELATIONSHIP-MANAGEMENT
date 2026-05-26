@@ -1,33 +1,59 @@
 import {
   BarChart3,
-  Boxes,
-  ClipboardCheck,
+  ClipboardList,
   FileText,
   GitCompare,
   LayoutDashboard,
+  ListChecks,
   PackageOpen,
+  PieChart,
+  ScrollText,
   Settings,
+  ShieldCheck,
   ShoppingCart,
-  Star,
-  Truck,
   Users,
+  UserCog,
 } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 import { DashboardLayout } from './DashboardLayout.jsx';
 
 const adminItems = [
   { label: 'Dashboard', to: '/admin', icon: LayoutDashboard, end: true },
-  { label: 'Suppliers', to: '/admin/suppliers', icon: Users },
-  { label: 'Products', to: '/admin/products', icon: Boxes },
-  { label: 'RFQ Management', to: '/admin/rfqs', icon: FileText },
-  { label: 'Bid Comparison', to: '/admin/bids', icon: GitCompare },
-  { label: 'Purchase Orders', to: '/admin/orders', icon: ShoppingCart },
-  { label: 'Goods Receiving', to: '/admin/receiving', icon: PackageOpen },
-  { label: 'Reviews', to: '/admin/reviews', icon: Star },
-  { label: 'Analytics', to: '/admin/analytics', icon: BarChart3 },
-  { label: 'Settings', to: '/admin/settings', icon: Settings },
-  { label: 'Compliance', to: '/admin/compliance', icon: ClipboardCheck },
-  { label: 'Logistics', to: '/admin/logistics', icon: Truck },
+  {
+    section: 'Sourcing',
+    items: [
+      { label: 'RFQs', to: '/admin/rfqs', icon: FileText },
+      { label: 'Bid Management', to: '/admin/bids', icon: GitCompare },
+      { label: 'Suppliers', to: '/admin/suppliers', icon: Users },
+    ],
+  },
+  {
+    section: 'Procurement',
+    items: [
+      { label: 'Purchase Orders', to: '/admin/orders', icon: ShoppingCart },
+      { label: 'Order Tracker', to: '/admin/order-tracker', icon: ClipboardList },
+      { label: 'Receipts & Reviews', to: '/admin/receipts-reviews', icon: PackageOpen },
+    ],
+  },
+  {
+    section: 'Analytics',
+    items: [
+      { label: 'Spend Analytics', to: '/admin/analytics', icon: PieChart },
+      { label: 'Reports', to: '/admin/reports', icon: BarChart3 },
+    ],
+  },
+  {
+    section: 'Governance',
+    items: [
+      { label: 'Audit Logs', to: '/admin/audit-logs', icon: ShieldCheck },
+      { label: 'User & Role Management', to: '/admin/roles', icon: UserCog },
+      { label: 'System Settings', to: '/admin/settings', icon: Settings },
+    ],
+  },
+  {
+    section: 'Profile',
+    items: [{ label: 'Profile', to: '/admin/profile', icon: ListChecks }],
+  },
 ];
 
 export function AdminLayout() {

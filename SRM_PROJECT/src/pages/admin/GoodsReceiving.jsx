@@ -8,17 +8,17 @@ import { number } from '../../utils/formatters.js';
 export function GoodsReceiving() {
   return (
     <>
-      <PageHeader title="Goods Receiving" description="Validate deliveries, record accepted quantities, and manage receiving variances." />
+      <PageHeader title="Receipts & Reviews" description="Confirm delivered items, record accepted quantities, and review supplier delivery quality." />
       <Card>
-        <CardHeader title="Receiving Queue" subtitle="Inbound receipts awaiting confirmation" />
+        <CardHeader title="Receipt Queue" subtitle="Deliveries awaiting confirmation and supplier review" />
         <DataTable
           data={receiving}
           columns={[
             { key: 'receipt', header: 'Receipt' },
             { key: 'po', header: 'PO' },
             { key: 'item', header: 'Item' },
-            { key: 'received', header: 'Received', render: (row) => number(row.received) },
-            { key: 'accepted', header: 'Accepted', render: (row) => number(row.accepted) },
+            { key: 'received', header: 'Delivered Qty', render: (row) => number(row.received) },
+            { key: 'accepted', header: 'Accepted Qty', render: (row) => number(row.accepted) },
             { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} /> },
           ]}
         />

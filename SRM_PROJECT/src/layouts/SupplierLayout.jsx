@@ -1,15 +1,43 @@
-import { FileText, LayoutDashboard, Package, ShoppingCart, Star, UserRound, WalletCards } from 'lucide-react';
+import { Bell, Gauge, History, Inbox, LayoutDashboard, ReceiptText, ShoppingBag, Star, Truck, UserRound } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 import { DashboardLayout } from './DashboardLayout.jsx';
 
 const supplierItems = [
   { label: 'Dashboard', to: '/supplier', icon: LayoutDashboard, end: true },
-  { label: 'Products', to: '/supplier/products', icon: Package },
-  { label: 'RFQs', to: '/supplier/rfqs', icon: FileText },
-  { label: 'My Bids', to: '/supplier/bids', icon: WalletCards },
-  { label: 'Orders', to: '/supplier/orders', icon: ShoppingCart },
-  { label: 'Reviews', to: '/supplier/reviews', icon: Star },
-  { label: 'Profile', to: '/supplier/profile', icon: UserRound },
+  {
+    section: 'Sourcing',
+    items: [
+      { label: 'RFQ Sourcing Inbox', to: '/supplier/rfqs', icon: Inbox },
+      { label: 'My Bids', to: '/supplier/bids', icon: ReceiptText },
+      { label: 'Bid History', to: '/supplier/bid-history', icon: History },
+    ],
+  },
+  {
+    section: 'Orders',
+    items: [
+      { label: 'Active Orders', to: '/supplier/orders', icon: Truck },
+      { label: 'Order History', to: '/supplier/order-history', icon: ShoppingBag },
+      { label: 'Invoices', to: '/supplier/invoices', icon: ReceiptText },
+    ],
+  },
+  {
+    section: 'Performance',
+    items: [
+      { label: 'KPI & Performance', to: '/supplier/performance', icon: Gauge },
+      { label: 'Reviews & Ratings', to: '/supplier/reviews', icon: Star },
+    ],
+  },
+  {
+    section: 'Workspace',
+    items: [
+      { label: 'Workspace Feed', to: '/supplier/workspace-feed', icon: Bell },
+      { label: 'Notifications', to: '/supplier/notifications', icon: Bell },
+    ],
+  },
+  {
+    section: 'Profile',
+    items: [{ label: 'Profile', to: '/supplier/profile', icon: UserRound }],
+  },
 ];
 
 export function SupplierLayout() {

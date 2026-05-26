@@ -14,10 +14,20 @@ import { currency } from '../../utils/formatters.js';
 export function SupplierManagement() {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 4;
   const filtered = useMemo(
     () => suppliers.filter((supplier) => `${supplier.name} ${supplier.category} ${supplier.region}`.toLowerCase().includes(query.toLowerCase())),
     [query],
   );
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedSuppliers = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const handleSearch = (value) => {
+    setQuery(value);
+    setPage(1);
+  };
 
   return (
     <>
@@ -28,7 +38,7 @@ export function SupplierManagement() {
           subtitle="Approved, onboarding, and monitored suppliers"
           action={
             <div className="flex flex-col gap-2 sm:flex-row">
-              <SearchBar value={query} onChange={setQuery} placeholder="Search suppliers" />
+              <SearchBar value={query} onChange={handleSearch} placeholder="Search suppliers" />
               <Button variant="secondary">
                 <Filter className="h-4 w-4" />
                 Filter
@@ -37,7 +47,7 @@ export function SupplierManagement() {
           }
         />
         <DataTable
-          data={filtered}
+          data={paginatedSuppliers}
           columns={[
             { key: 'id', header: 'Supplier ID' },
             { key: 'name', header: 'Name' },
@@ -59,7 +69,12 @@ export function SupplierManagement() {
             },
           ]}
         />
-        <Pagination />
+        <Pagination
+          page={currentPage}
+          total={totalPages}
+          onPrevious={() => setPage((current) => Math.max(1, current - 1))}
+          onNext={() => setPage((current) => Math.min(totalPages, current + 1))}
+        />
       </Card>
       <Modal title="Supplier Detail" isOpen={Boolean(selected)} onClose={() => setSelected(null)}>
         {selected ? (
