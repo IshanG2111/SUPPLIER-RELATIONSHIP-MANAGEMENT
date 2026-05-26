@@ -1,4 +1,5 @@
-import { Bell, Menu, Search } from 'lucide-react';
+import { Bell, Menu, Search, ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from './Button.jsx';
 import ThemeToggle from '../../Theme.jsx';
 
@@ -32,6 +33,12 @@ export function Navbar({ title, onMenu }) {
         </div>
         
         <ThemeToggle />
+
+        <Link to="/privacy" title="Privacy Policy & Registry">
+          <Button variant="ghost" className="h-11 w-11 p-0 dark:text-slate-300 dark:hover:bg-slate-800">
+            <ShieldCheck className="h-5 w-5" />
+          </Button>
+        </Link>
 
         <div className="relative">
           <Button variant="ghost" className="h-11 w-11 p-0 dark:text-slate-300 dark:hover:bg-slate-800" aria-label="Notifications">

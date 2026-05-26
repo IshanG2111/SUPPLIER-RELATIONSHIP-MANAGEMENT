@@ -10,7 +10,7 @@ import { StatusBadge } from '../../components/StatusBadge.jsx';
 import { useDisclosure } from '../../hooks/useDisclosure.js';
 import { currency } from '../../utils/formatters.js';
 import { createRfqId, getStoredRfqs, saveStoredRfqs } from '../../utils/rfqStore.js';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 const initialForm = {
   title: '',
@@ -28,6 +28,24 @@ export function RFQManagement() {
   const createRfq = useDisclosure(false);
   const [rfqList, setRfqList] = useState(() => getStoredRfqs());
   const [form, setForm] = useState(initialForm);
+  const [isParsing, setIsParsing] = useState(false);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
+
+  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1/SUPPLIER-RELATIONSHIP-MANAGEMENT/SRM_PROJECT/backend/api').replace(/\/$/, '');
+
+  useEffect(() => {
+    fetch(`${apiBaseUrl}/rfqs.php`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.rfqs)) {
+          setRfqList(data.rfqs);
+          saveStoredRfqs(data.rfqs);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch RFQs from API, using localStorage:', err);
+      });
+  }, [apiBaseUrl]);
 
   const nextRfqId = useMemo(() => createRfqId(rfqList), [rfqList]);
 
@@ -35,8 +53,37 @@ export function RFQManagement() {
     setForm((current) => ({ ...current, [field]: value }));
   };
 
+  const handlePdfUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setIsParsing(true);
+    if (pdfBlobUrl) {
+      URL.revokeObjectURL(pdfBlobUrl);
+    }
+    setPdfBlobUrl(URL.createObjectURL(file));
+    try {
+      const { extractTextFromPdf, parseRfqPdf } = await import('../../utils/pdfParser.js');
+      const text = await extractTextFromPdf(file);
+      const parsed = parseRfqPdf(text, file.name);
+      setForm({
+        title: parsed.title,
+        category: parsed.category,
+        deadline: parsed.deadline,
+        value: parsed.value,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsParsing(false);
+    }
+  };
+
   const resetAndClose = () => {
     setForm(initialForm);
+    if (pdfBlobUrl) {
+      URL.revokeObjectURL(pdfBlobUrl);
+      setPdfBlobUrl(null);
+    }
     createRfq.close();
   };
 
@@ -56,6 +103,15 @@ export function RFQManagement() {
       saveStoredRfqs(updated);
       return updated;
     });
+
+    fetch(`${apiBaseUrl}/rfqs.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newRfq),
+    })
+      .then((res) => res.json())
+      .catch((err) => console.error('Failed to sync RFQ to database:', err));
+
     resetAndClose();
   };
 
@@ -68,6 +124,12 @@ export function RFQManagement() {
         saveStoredRfqs(updated);
         return updated;
       });
+
+      fetch(`${apiBaseUrl}/rfqs.php?id=${id}`, {
+        method: 'DELETE',
+      })
+        .then((res) => res.json())
+        .catch((err) => console.error('Failed to delete RFQ from database:', err));
     }
   };
 
@@ -116,51 +178,94 @@ export function RFQManagement() {
         />
       </Card>
 
-      <Modal title="Create RFQ" isOpen={createRfq.isOpen} onClose={createRfq.close}>
-        <div className="mb-5 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3">
-          <p className="text-sm font-semibold text-blue-900">Draft a new sourcing request</p>
-          <p className="mt-1 text-sm text-blue-700">Fill the basic RFQ details. You can add invitees and documents after saving.</p>
+      <Modal title="Create RFQ" isOpen={createRfq.isOpen} onClose={resetAndClose} size={pdfBlobUrl ? 'xxl' : 'lg'}>
+        <div className={`grid gap-6 ${pdfBlobUrl ? 'md:grid-cols-2' : ''}`}>
+          <div>
+            <div className="mb-5 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3">
+              <p className="text-sm font-semibold text-blue-900">Draft a new sourcing request</p>
+              <p className="mt-1 text-sm text-blue-700">Fill the basic RFQ details. You can add invitees and documents after saving.</p>
+            </div>
+            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <div className="mb-4 rounded-lg border border-dashed border-slate-300 p-4 text-center dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Upload Procurement Spec PDF to Auto-Fill Form</p>
+                <input
+                  type="file"
+                  accept=".pdf"
+                  className="text-xs text-slate-600 dark:text-slate-400 block mx-auto cursor-pointer"
+                  onChange={handlePdfUpload}
+                  disabled={isParsing}
+                />
+                <div className="mt-2">
+                  <a href={`${import.meta.env.BASE_URL}samples/rfq-procurement-spec.pdf`} download className="text-xs text-brand-600 hover:text-brand-500 underline font-semibold">
+                    Download Sample RFQ Procurement Spec
+                  </a>
+                </div>
+                {isParsing && <p className="mt-1.5 text-[11px] text-blue-500 animate-pulse">Extracting specifications...</p>}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField label="RFQ title">
+                  <input
+                    className={inputClass}
+                    placeholder="Material or service requirement"
+                    value={form.title}
+                    onChange={(event) => updateForm('title', event.target.value)}
+                  />
+                </FormField>
+                <FormField label="Category">
+                  <select className={inputClass} value={form.category} onChange={(event) => updateForm('category', event.target.value)}>
+                    <option>Manufacturing</option>
+                    <option>Logistics</option>
+                    <option>Facilities</option>
+                    <option>Services</option>
+                  </select>
+                </FormField>
+                <FormField label="Deadline">
+                  <input className={inputClass} type="date" value={form.deadline} onChange={(event) => updateForm('deadline', event.target.value)} />
+                </FormField>
+                <FormField label="Target value">
+                  <input
+                    className={inputClass}
+                    placeholder="$500,000"
+                    value={form.value}
+                    onChange={(event) => updateForm('value', event.target.value)}
+                  />
+                </FormField>
+              </div>
+              <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+                <Button type="button" variant="secondary" onClick={resetAndClose}>
+                  Cancel
+                </Button>
+                <Button type="button" onClick={handleSave}>
+                  <CalendarPlus className="h-4 w-4" />
+                  Save RFQ
+                </Button>
+              </div>
+            </form>
+          </div>
+
+          {pdfBlobUrl && (
+            <div className="flex flex-col h-[520px] rounded-lg border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 p-2">
+              <div className="mb-2 flex items-center justify-between px-2 text-xs font-semibold text-slate-500">
+                <span>Verification Spec Document View</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    URL.revokeObjectURL(pdfBlobUrl);
+                    setPdfBlobUrl(null);
+                  }}
+                  className="text-rose-600 hover:underline"
+                >
+                  Hide PDF
+                </button>
+              </div>
+              <iframe
+                src={pdfBlobUrl}
+                title="PDF Verification"
+                className="w-full flex-1 rounded border border-slate-200 dark:border-slate-800 bg-white"
+              />
+            </div>
+          )}
         </div>
-        <form className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="RFQ title">
-              <input
-                className={inputClass}
-                placeholder="Material or service requirement"
-                value={form.title}
-                onChange={(event) => updateForm('title', event.target.value)}
-              />
-            </FormField>
-            <FormField label="Category">
-              <select className={inputClass} value={form.category} onChange={(event) => updateForm('category', event.target.value)}>
-                <option>Manufacturing</option>
-                <option>Logistics</option>
-                <option>Facilities</option>
-                <option>Services</option>
-              </select>
-            </FormField>
-            <FormField label="Deadline">
-              <input className={inputClass} type="date" value={form.deadline} onChange={(event) => updateForm('deadline', event.target.value)} />
-            </FormField>
-            <FormField label="Target value">
-              <input
-                className={inputClass}
-                placeholder="$500,000"
-                value={form.value}
-                onChange={(event) => updateForm('value', event.target.value)}
-              />
-            </FormField>
-          </div>
-          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="secondary" onClick={resetAndClose}>
-              Cancel
-            </Button>
-            <Button type="button" onClick={handleSave}>
-              <CalendarPlus className="h-4 w-4" />
-              Save RFQ
-            </Button>
-          </div>
-        </form>
       </Modal>
     </div>
   );
