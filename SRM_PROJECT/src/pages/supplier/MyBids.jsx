@@ -8,8 +8,9 @@ import { useDisclosure } from '../../hooks/useDisclosure.js';
 import { FormField, inputClass } from '../../components/FormField.jsx';
 import { currency } from '../../utils/formatters.js';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Plus, Check, UploadCloud, FileText, Send, ArrowLeftRight, Loader2, ClipboardList, Package, Calendar, IndianRupee, Tag, Info, AlertCircle } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Plus, Check, UploadCloud, FileText, Send, ArrowLeftRight, Loader2, ClipboardList, Package, Calendar, IndianRupee, Tag, Info, AlertCircle, MessageSquare } from 'lucide-react';
+import { CustomNotification } from '../../components/CustomNotification.jsx';
 
 const initialForm = {
   rfqPackage: 'RFQ-24061',
@@ -22,6 +23,13 @@ const initialForm = {
 export function MyBids() {
   const submitBidModal = useDisclosure(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const [customAlert, setCustomAlert] = useState({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
   const currentUser = useMemo(() => {
     return JSON.parse(sessionStorage.getItem('srm_user') || '{"id":2,"fullName":"Supplier User","email":"supplier@srm.local","role":"supplier","companyName":"Apex Industrial Components"}');
   }, []);
@@ -164,7 +172,7 @@ export function MyBids() {
     return { subtotal, taxTotal, freight, grandTotal };
   }, [form.items, form.freight]);
 
-  useEffect(() => {
+  const fetchBids = useCallback(() => {
     fetch(`${apiBaseUrl}/bids.php`)
       .then((res) => res.json())
       .then((data) => {
@@ -187,6 +195,10 @@ export function MyBids() {
         console.error('Failed to fetch Bids from API, using localStorage:', err);
       });
   }, [apiBaseUrl, currentUser.id]);
+
+  useEffect(() => {
+    fetchBids();
+  }, [fetchBids]);
 
   useEffect(() => {
     if (location.state && location.state.rfqId) {
@@ -311,14 +323,26 @@ export function MyBids() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          setForm(curr => ({ ...curr, price: totals.grandTotal }));
-          setIsSubmitted(true);
+          resetAndClose();
+          fetchBids();
+          setCustomAlert({
+            isOpen: true,
+            type: 'success',
+            title: 'Proposal Submitted',
+            message: `Your quote for RFQ ${form.rfqPackage} has been successfully submitted.`
+          });
         }
       })
       .catch((err) => {
         console.error('Failed to sync Bid to database:', err);
-        setForm(curr => ({ ...curr, price: totals.grandTotal }));
-        setIsSubmitted(true);
+        resetAndClose();
+        fetchBids();
+        setCustomAlert({
+          isOpen: true,
+          type: 'success',
+          title: 'Proposal Submitted',
+          message: `Your quote for RFQ ${form.rfqPackage} has been successfully submitted (local fallback synced).`
+        });
       });
   };
 
@@ -819,7 +843,19 @@ export function MyBids() {
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{row.score}</span>
               </div>
             )},
-            { key: 'best', header: 'Status', render: (row) => <StatusBadge status={row.best ? 'Approved' : 'Evaluating'} /> },
+            { key: 'best', header: 'Status', render: (row) => <StatusBadge status={row.status || (row.best ? 'Approved' : 'Evaluating')} /> },
+            { 
+              key: 'negotiate', 
+              header: 'Negotiation', 
+              render: (row) => (
+                <button
+                  onClick={() => navigate(`/supplier/bids/negotiate/${row.id}`)}
+                  className="inline-flex items-center gap-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 transition shadow-sm"
+                >
+                  <MessageSquare className="h-3.5 w-3.5" /> Room
+                </button>
+              )
+            },
           ]}
         />
       </Card>
@@ -869,6 +905,14 @@ export function MyBids() {
           </div>
         )}
       </Modal>
+      
+      <CustomNotification 
+        isOpen={customAlert.isOpen}
+        onClose={() => setCustomAlert(prev => ({ ...prev, isOpen: false }))}
+        type={customAlert.type}
+        title={customAlert.title}
+        message={customAlert.message}
+      />
     </>
   );
 }

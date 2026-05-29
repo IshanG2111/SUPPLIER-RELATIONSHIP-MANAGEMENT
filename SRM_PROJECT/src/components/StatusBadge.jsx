@@ -19,6 +19,22 @@ const styles = {
   Low: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
   Medium: 'bg-amber-50 text-amber-700 ring-amber-600/20',
   High: 'bg-rose-50 text-rose-700 ring-rose-600/20',
+  // New Proposal & Negotiation statuses
+  Submitted: 'bg-blue-50 text-blue-700 ring-blue-600/20',
+  submitted: 'bg-blue-50 text-blue-700 ring-blue-600/20',
+  'Under Review': 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  under_review: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  Awarded: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  awarded: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  Rejected: 'bg-rose-50 text-rose-700 ring-rose-600/20',
+  rejected: 'bg-rose-50 text-rose-700 ring-rose-600/20',
+  'Under Negotiation': 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  under_negotiation: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  Countered: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  countered: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  Finalized: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  finalized: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  accepted: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
 };
 
 export function StatusBadge({ status }) {

@@ -22,3 +22,10 @@ dist-ssr
 *.sw?
 
 .env
+
+# Demo data and testing files
+backend/database/demo_seed_TataMotors.sql
+docs/demo-seeding-guide.md
+demo-seeding-guide.md
+testdb.php
+testlogin.php

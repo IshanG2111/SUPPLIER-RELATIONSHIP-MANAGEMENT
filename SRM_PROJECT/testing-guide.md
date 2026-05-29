@@ -24,7 +24,7 @@ This portal simulates the interactions between several corporate departments and
 
 ---
 
-## The 11-Step End-to-End Testing Flow
+## The 12-Step End-to-End Testing Flow
 
 Follow these steps sequentially to test the full Procurement Lifecycle.
 
@@ -80,6 +80,30 @@ Follow these steps sequentially to test the full Procurement Lifecycle.
      * *Delivery Lead Time*: `12 days`
      * *Warranty Period*: `3 years`
   6. Click **Submit Proposal** to save the bid to the `bids` table.
+
+---
+
+### STEP 4.5 — Collaborative Price Negotiation (Live Room)
+* **DFD Process**: 2.3.1 Interactive Bid Negotiation | **Actors**: Admin & Supplier
+* **Actions**:
+  1. **Admin Proposes Counter-Offer**:
+     * In the **Admin Console**, go to **Bid Management** and select the RFQ.
+     * Click the **Negotiate** button next to the supplier's quotation (routes to `/admin/bids/negotiate/:bidId`).
+     * In the Negotiation Room, click **Propose Counter** under the pricing card.
+     * Enter a revised total price (e.g. `90000` INR) and a note (e.g. "Bulk volume discount adjustment"). Click **Submit Counter**.
+     * **Verification**: Verify the price in `supplier_quotes` and all item unit prices/totals in `supplier_quote_items` are scaled in the database, and a system message appears in the chat log.
+  2. **Supplier Responds with Counter-Offer**:
+     * Open the **Supplier Workspace** in another tab representing the bidding supplier.
+     * Navigate to **My Bids** and click the **Negotiate Room** button next to the bid.
+     * In the Negotiation Room, verify the active round banner displays the Admin's counter-offer of ₹90,000.
+     * Click the **Counter-Propose** button in the callout banner, enter `95000` INR, and click **Submit Counter**.
+     * **Verification**: Confirm the database updates the quote values and line items to reflect the supplier's ₹95,050 counter-offer.
+  3. **Admin Accepts the Negotiated Price**:
+     * Return to the **Admin Console negotiation window.
+     * The Admin sees the Supplier's counter-offer of ₹95,000 in the Callout Banner.
+     * Click **Accept Price** inside the banner.
+     * **Styled Dialog Verification**: Verify a custom modal popup appears asking *"Are you sure you want to accept the bid price of ₹95,000.00? This will lock the negotiated terms."*
+     * Click **Confirm**. The bid status updates to `accepted` and terms are locked.
 
 ---
 

@@ -35,6 +35,7 @@ import { WorkspaceFeed } from '../pages/supplier/WorkspaceFeed.jsx';
 import { Notifications } from '../pages/supplier/Notifications.jsx';
 import { SupplierKpiPerformance } from '../pages/supplier/KpiPerformance.jsx';
 import { SupplierProfile } from '../pages/supplier/Profile.jsx';
+import { NegotiationRoom } from '../pages/NegotiationRoom.jsx';
 import { NotFound } from '../pages/NotFound.jsx';
 import { RootRedirect } from '../components/RootRedirect.jsx';
 import { PrivacyPolicy } from '../pages/PrivacyPolicy.jsx';
@@ -61,6 +62,7 @@ export const appRoutes = [
       { path: 'rfqs', element: <RFQManagement /> },
       { path: 'rfqs/:id', element: <RFQDetail /> },
       { path: 'bids', element: <BidComparison /> },
+      { path: 'bids/negotiate/:bidId', element: <NegotiationRoom /> },
       { path: 'orders', element: <PurchaseOrders /> },
       { path: 'order-tracker', element: <OrderTracker /> },
       { path: 'receiving', element: <GoodsReceiving /> },
@@ -85,6 +87,7 @@ export const appRoutes = [
       { path: 'products', element: <SupplierProducts /> },
       { path: 'rfqs', element: <SupplierRFQs /> },
       { path: 'bids', element: <MyBids /> },
+      { path: 'bids/negotiate/:bidId', element: <NegotiationRoom /> },
       { path: 'bid-history', element: <MyBids /> },
       { path: 'orders', element: <SupplierOrders /> },
       { path: 'order-history', element: <SupplierOrderHistory /> },

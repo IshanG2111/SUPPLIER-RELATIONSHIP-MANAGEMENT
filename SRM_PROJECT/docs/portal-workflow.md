@@ -54,10 +54,14 @@ The SRM Portal simulates the workflows of a real-world corporate setting:
 * **Spreadsheet Auto-Calculation**: The quotation is rendered as a clean, digital quotation sheet. Suppliers enter the **Unit Price** and **Tax (%)** for each line item. The system automatically computes line totals: `Quantity * Unit Price * (1 + Tax % / 100)`.
 * **Quotation Summary**: The sheet calculates the Subtotal, Tax Total, Freight (user input), and Grand Total Quoted Price automatically. Manual typing of the grand total is disabled to avoid arithmetic mismatch.
 
-### 3. Bid Evaluation & Contract Award
-* **Role**: Admin (Sourcing Team)
-* **What happens**: The Admin reviews competing bids in the **Bid Comparison Matrix**. The matrix displays both item-by-item unit prices and line totals, plus overall summary parameters (Subtotal, Taxes, Freight, Grand Total) side-by-side.
-* **Dynamic RFQ Comparison Selector**: Admins can toggle between different RFQs using the dropdown selector in the header to instantly filter and rebuild the matrix comparison columns.
+### 3. Bid Evaluation & Interactive Negotiation
+* **Role**: Admin (Sourcing Team) & Supplier (Commercial Lead)
+* **What happens**: The Admin reviews competing bids in the **Bid Comparison Matrix**. To adjust pricing dynamically, the Admin clicks **Negotiate** to enter the live **Negotiation Room**.
+* **Interactive Live Room & Scaling**: 
+  - Procurement Admin and Supplier collaborate via a real-time chat (3-second Ajax polling) and exchange binding commercial counter-proposals.
+  - **Dynamic Price Scaling**: To maintain database integrity, whenever a new counter-offer total is proposed or accepted, the system runs an automatic scaling script (`update_bid_negotiated_values`). This script scales all pre-tax item unit prices and line totals in `supplier_quote_items` proportionally so they sum up with taxes and fixed freight charges to the new negotiated grand total.
+  - **Recipient Controls & Confirmation**: The recipient of the counter-proposal sees active action buttons (`Accept Price`, `Counter-Propose`, `Reject & Close`). Admin acceptances require explicit confirmation via a styled modal popup dialog.
+  - Once accepted, the terms are locked, and the Admin can finalize the contract to generate a legally binding Purchase Order (PO).
 
 ### 4. Goods Receiving & Inspection
 * **Role**: Admin (Warehouse Supervisor)

@@ -38,6 +38,7 @@ Provides administrators with complete control and visibility over the supply cha
 * **Admin Dashboard**: Real-time analytical cards and charts showing supplier activity, RFQ cycles, and purchase commitments.
 * **RFQ Management**: Create and track Requests for Quotations (RFQs) and view sub-details.
 * **Advanced Bid Comparison**: Interactive charts to compare multiple supplier proposals side-by-side.
+* **Interactive Negotiation Room**: Real-time collaborative workspace for Admins and Suppliers to negotiate bid values, propose counter-offers, chat, and lock negotiated pricing with proportional line-item price scaling.
 * **Purchase Orders & Tracking**: Manage PO pipelines and track order fulfillment statuses.
 * **Governance Tools**: Monitor activity through the **Audit Logs** panel and control access via **User & Role Management**.
 * **System Settings & Profile**: Manage system configurations and profile details.
@@ -47,6 +48,7 @@ Empowers suppliers to manage quotations, products, and fulfillment:
 * **Supplier Dashboard**: View bidding summary, performance statistics, and ongoing orders.
 * **RFQ Sourcing Inbox**: View and bid on open sourcing requests.
 * **Product Catalog**: Upload, list, and modify product offerings.
+* **Interactive Negotiation Room**: Real-time collaborative workspace to respond to buyers' pricing counters, propose counter-offers, and accept final pricing terms.
 * **Order & Delivery History**: Track active purchase orders, shipment tracking, and invoice history.
 * **KPI & Performance Metrics**: Real-time ratings and scorecards evaluating delivery, pricing, and quality.
 * **Workspace Feed & Notifications**: Interactive activity logs and notifications feed.
@@ -120,4 +122,8 @@ Launch Vite development server:
 ```bash
 npm run dev
 ```
+
+### 3. Populate Demo Data (Optional)
+To quickly test the entire portal with pre-populated Tata Motors sourcing, bidding, and active negotiation room data:
+- Follow the [Demo Database Seeding Guide](file:///c:/xampp/htdocs/SUPPLIER-RELATIONSHIP-MANAGEMENT/SRM_PROJECT/demo-seeding-guide.md) to import the pre-configured [demo_seed_TataMotors.sql](file:///c:/xampp/htdocs/SUPPLIER-RELATIONSHIP-MANAGEMENT/SRM_PROJECT/backend/database/demo_seed_TataMotors.sql) script into your database.
 Open **`http://127.0.0.1:5173`** in your browser.

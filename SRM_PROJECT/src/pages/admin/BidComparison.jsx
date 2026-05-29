@@ -1,4 +1,4 @@
-import { Award } from 'lucide-react';
+import { Award, MessageSquare } from 'lucide-react';
 import { Card, CardHeader } from '../../components/Card.jsx';
 import { DataTable } from '../../components/DataTable.jsx';
 import { PageHeader } from '../../components/PageHeader.jsx';
@@ -6,10 +6,18 @@ import { StatusBadge } from '../../components/StatusBadge.jsx';
 import { currency } from '../../utils/formatters.js';
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CustomNotification } from '../../components/CustomNotification.jsx';
 
 export function BidComparison() {
   const navigate = useNavigate();
   const [rfqList, setRfqList] = useState([]);
+  const [customAlert, setCustomAlert] = useState({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: '',
+    onConfirm: null
+  });
   const [selectedRfqId, setSelectedRfqId] = useState('RFQ-24061');
   const [allBids, setAllBids] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,16 +48,31 @@ export function BidComparison() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          alert('Contract successfully awarded! Legally binding PO has been issued.');
           setShowConfirmModal(false);
-          navigate('/admin/orders');
+          setCustomAlert({
+            isOpen: true,
+            type: 'success',
+            title: 'Contract Awarded',
+            message: 'Contract successfully awarded! The legally binding PO has been generated and issued.',
+            onConfirm: () => navigate('/admin/orders')
+          });
         } else {
-          alert('Failed to award contract: ' + data.message);
+          setCustomAlert({
+            isOpen: true,
+            type: 'error',
+            title: 'Award Failed',
+            message: 'Failed to award contract: ' + data.message
+          });
         }
       })
       .catch((err) => {
         console.error(err);
-        alert('An error occurred while awarding contract.');
+        setCustomAlert({
+          isOpen: true,
+          type: 'error',
+          title: 'Error',
+          message: 'An error occurred while awarding contract.'
+        });
       })
       .finally(() => {
         setIsSubmitting(false);
@@ -197,15 +220,23 @@ export function BidComparison() {
         key: 'actions',
         header: 'Action',
         render: (row) => (
-          <button
-            onClick={() => {
-              setAwardingBid(row);
-              setShowConfirmModal(true);
-            }}
-            className="inline-flex items-center gap-1 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 transition shadow-sm"
-          >
-            <Award className="h-3.5 w-3.5" /> Award
-          </button>
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => {
+                setAwardingBid(row);
+                setShowConfirmModal(true);
+              }}
+              className="inline-flex items-center gap-1 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 transition shadow-sm"
+            >
+              <Award className="h-3.5 w-3.5" /> Award
+            </button>
+            <button
+              onClick={() => navigate(`/admin/bids/negotiate/${row.id}`)}
+              className="inline-flex items-center gap-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 transition shadow-sm"
+            >
+              <MessageSquare className="h-3.5 w-3.5" /> Negotiate
+            </button>
+          </div>
         ),
       });
     } else if (selectedRfq && selectedRfq.status === 'Awarded') {
@@ -351,6 +382,17 @@ This Purchase Order is issued electronically and is legally valid without physic
           </div>
         </div>
       )}
+
+      <CustomNotification 
+        isOpen={customAlert.isOpen}
+        onClose={() => {
+          setCustomAlert(prev => ({ ...prev, isOpen: false }));
+          if (customAlert.onConfirm) customAlert.onConfirm();
+        }}
+        type={customAlert.type}
+        title={customAlert.title}
+        message={customAlert.message}
+      />
     </>
   );
 }
