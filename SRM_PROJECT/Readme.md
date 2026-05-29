@@ -122,8 +122,4 @@ Launch Vite development server:
 ```bash
 npm run dev
 ```
-
-### 3. Populate Demo Data (Optional)
-To quickly test the entire portal with pre-populated Tata Motors sourcing, bidding, and active negotiation room data:
-- Follow the [Demo Database Seeding Guide](file:///c:/xampp/htdocs/SUPPLIER-RELATIONSHIP-MANAGEMENT/SRM_PROJECT/demo-seeding-guide.md) to import the pre-configured [demo_seed_TataMotors.sql](file:///c:/xampp/htdocs/SUPPLIER-RELATIONSHIP-MANAGEMENT/SRM_PROJECT/backend/database/demo_seed_TataMotors.sql) script into your database.
 Open **`http://127.0.0.1:5173`** in your browser.

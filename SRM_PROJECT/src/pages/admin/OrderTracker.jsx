@@ -32,11 +32,12 @@ export function OrderTracker() {
       let carrier = 'Tata Motors Logistics';
 
       // Carrier based on supplier name
-      if (po.supplier_name.includes('Apex')) {
+      const supplierName = po.supplier_name || '';
+      if (supplierName.includes('Apex')) {
         carrier = 'DHL Freight';
-      } else if (po.supplier_name.includes('Vector')) {
+      } else if (supplierName.includes('Vector')) {
         carrier = 'FedEx Supply Chain';
-      } else if (po.supplier_name.includes('Northstar')) {
+      } else if (supplierName.includes('Northstar')) {
         carrier = 'Northstar Fleet';
       }
 
@@ -75,8 +76,8 @@ export function OrderTracker() {
 
       return {
         id: po.po_number,
-        supplier: po.supplier_name,
-        stage: po.status.toUpperCase(),
+        supplier: supplierName || 'Unknown Supplier',
+        stage: (po.status || '').toUpperCase(),
         progress,
         eta: po.delivery_date || 'N/A',
         carrier,
@@ -204,7 +205,7 @@ export function OrderTracker() {
                 </div>
                 <p className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400">
                   {po.status === 'cancelled' 
-                    ? `This Purchase Order with ${po.supplier_name} was formally cancelled and is legally void.` 
+                    ? `This Purchase Order with ${po.supplier_name || 'Unknown Supplier'} was formally cancelled and is legally void.` 
                     : `This PO is currently on hold. Contact sourcing or supplier manager to resolve the administrative bottleneck.`
                   }
                 </p>
