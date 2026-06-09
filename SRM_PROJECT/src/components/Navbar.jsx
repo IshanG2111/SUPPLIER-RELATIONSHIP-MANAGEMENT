@@ -1,9 +1,43 @@
 import { Bell, Menu, Search, ShieldCheck } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from './Button.jsx';
 import ThemeToggle from '../../Theme.jsx';
+import { useState, useEffect } from 'react';
 
 export function Navbar({ title, onMenu }) {
+  const location = useLocation();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const updateCount = () => {
+      try {
+        const saved = localStorage.getItem('srm_notifications');
+        const list = saved ? JSON.parse(saved) : [];
+        if (Array.isArray(list)) {
+          const count = list.filter(n => n && !n.read && !n.is_read).length;
+          setUnreadCount(count);
+        } else {
+          setUnreadCount(0);
+        }
+      } catch (err) {
+        console.warn('Failed to parse notifications in Navbar:', err);
+        setUnreadCount(0);
+      }
+    };
+
+    updateCount();
+    window.addEventListener('storage', updateCount);
+    window.addEventListener('srm_notifications_updated', updateCount);
+
+    return () => {
+      window.removeEventListener('storage', updateCount);
+      window.removeEventListener('srm_notifications_updated', updateCount);
+    };
+  }, []);
+
+  const isAdmin = location.pathname.startsWith('/admin') || window.location.hash.startsWith('#/admin');
+  const notificationsLink = isAdmin ? '/admin/notifications' : '/supplier/notifications';
+
   const now = new Date();
   const hour = now.getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
@@ -40,15 +74,17 @@ export function Navbar({ title, onMenu }) {
           </Button>
         </Link>
 
-        <div className="relative">
+        <Link to={notificationsLink} className="relative" title="Notifications">
           <Button variant="ghost" className="h-11 w-11 p-0 dark:text-slate-300 dark:hover:bg-slate-800" aria-label="Notifications">
             <Bell className="h-5 w-5" />
           </Button>
-          <span className="absolute right-2 top-2 flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-500" />
-          </span>
-        </div>
+          {unreadCount > 0 && (
+            <span className="absolute right-2 top-2 flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-500" />
+            </span>
+          )}
+        </Link>
       </div>
     </header>
   );

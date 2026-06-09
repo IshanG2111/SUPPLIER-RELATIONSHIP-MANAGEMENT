@@ -220,7 +220,16 @@ export function NegotiationRoom() {
       const data = await res.json();
       if (data.success) {
         fetchRoomData(false);
-        showAlert('Action Success', 'Counter-offer response recorded.', 'success');
+        showAlert(
+          'Action Success', 
+          'Counter-offer response recorded.', 
+          'success',
+          () => {
+            if (responseType === 'accept') {
+              navigate(isAdmin ? `/admin/bids?rfqId=${rfqDetails?.id}` : '/supplier/bids');
+            }
+          }
+        );
       } else {
         showAlert('Action Failed', data.message, 'error');
       }

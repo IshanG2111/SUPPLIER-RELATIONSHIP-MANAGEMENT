@@ -209,8 +209,8 @@ export function RFQManagement() {
         />
       </Card>
 
-      <Modal title="Create RFQ" isOpen={createRfq.isOpen} onClose={resetAndClose} size={pdfBlobUrl ? 'xxl' : 'lg'}>
-        <div className={`grid gap-6 ${pdfBlobUrl ? 'md:grid-cols-2' : ''}`}>
+      <Modal title="Create RFQ" isOpen={createRfq.isOpen} onClose={resetAndClose} size="lg">
+        <div className="grid gap-6">
           <div>
             <div className="mb-5 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3">
               <p className="text-sm font-semibold text-blue-900">Draft a new sourcing request</p>
@@ -393,29 +393,6 @@ export function RFQManagement() {
               </div>
             </form>
           </div>
-
-          {pdfBlobUrl && (
-            <div className="flex flex-col h-[520px] rounded-lg border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 p-2">
-              <div className="mb-2 flex items-center justify-between px-2 text-xs font-semibold text-slate-500">
-                <span>Verification Spec Document View</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    URL.revokeObjectURL(pdfBlobUrl);
-                    setPdfBlobUrl(null);
-                  }}
-                  className="text-rose-600 hover:underline"
-                >
-                  Hide PDF
-                </button>
-              </div>
-              <iframe
-                src={pdfBlobUrl}
-                title="PDF Verification"
-                className="w-full flex-1 rounded border border-slate-200 dark:border-slate-800 bg-white"
-              />
-            </div>
-          )}
         </div>
       </Modal>
     </div>

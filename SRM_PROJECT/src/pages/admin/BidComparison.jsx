@@ -5,11 +5,14 @@ import { PageHeader } from '../../components/PageHeader.jsx';
 import { StatusBadge } from '../../components/StatusBadge.jsx';
 import { currency } from '../../utils/formatters.js';
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CustomNotification } from '../../components/CustomNotification.jsx';
 
 export function BidComparison() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const rfqQueryId = searchParams.get('rfqId');
+
   const [rfqList, setRfqList] = useState([]);
   const [customAlert, setCustomAlert] = useState({
     isOpen: false,
@@ -18,13 +21,14 @@ export function BidComparison() {
     message: '',
     onConfirm: null
   });
-  const [selectedRfqId, setSelectedRfqId] = useState('RFQ-24061');
+  const [selectedRfqId, setSelectedRfqId] = useState('');
   const [allBids, setAllBids] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRfqDetails, setSelectedRfqDetails] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [awardingBid, setAwardingBid] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1/SUPPLIER-RELATIONSHIP-MANAGEMENT/SRM_PROJECT/backend/api').replace(/\/$/, '');
 
@@ -87,8 +91,12 @@ export function BidComparison() {
         if (data.success && Array.isArray(data.rfqs)) {
           setRfqList(data.rfqs);
           if (data.rfqs.length > 0) {
-            const activeRfq = data.rfqs.find(r => r.status === 'Active' || r.status === 'Under Evaluation');
-            setSelectedRfqId(activeRfq ? activeRfq.id : data.rfqs[0].id);
+            if (rfqQueryId) {
+              setSelectedRfqId(rfqQueryId);
+            } else {
+              const activeRfq = data.rfqs.find(r => r.status === 'Active' || r.status === 'Under Evaluation');
+              setSelectedRfqId(activeRfq ? activeRfq.id : data.rfqs[0].id);
+            }
           }
         }
       })
@@ -104,7 +112,7 @@ export function BidComparison() {
       })
       .catch((err) => console.error('Failed to fetch Bids:', err))
       .finally(() => setLoading(false));
-  }, [apiBaseUrl]);
+  }, [apiBaseUrl, rfqQueryId]);
 
   useEffect(() => {
     if (selectedRfqId) {
@@ -342,7 +350,7 @@ export function BidComparison() {
               <div>
                 <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 block mb-1">CONTRACT LEGAL TERMS & CONDITIONS</span>
                 <div className="h-44 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-3 text-[10px] leading-5 font-mono text-slate-600 dark:text-slate-300">
-                  {`PURCHASE ORDER AGREEMENT — TATA MOTORS LTD
+                  {`PURCHASE ORDER AGREEMENT — NEXUS MANUFACTURING LTD
 
 PO Number      : PO-${new Date().getFullYear()}-XXXX
 Issued Date    : ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -352,12 +360,12 @@ Delivery By    : (Quoted Lead Time: ${awardingBid.delivery})
 Total Value    : INR ${Number(awardingBid.grand_total || awardingBid.price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
 
 TERMS & CONDITIONS:
-1. This Purchase Order constitutes a legally binding procurement contract issued by Tata Motors Ltd.
+1. This Purchase Order constitutes a legally binding procurement contract issued by Nexus Manufacturing Ltd.
 2. The Supplier agrees to deliver all items specified herein in full, on or before the delivery date.
 3. Payment Terms: Net 30 days upon delivery and submission of a valid GST tax invoice.
 4. Any deviation in quantity, specifications, or delivery schedule requires prior written approval.
 5. Goods not conforming to specifications will be rejected at the Supplier's expense.
-6. Tata Motors reserves the right to cancel this PO with written notice of 7 business days.
+6. Nexus Manufacturing reserves the right to cancel this PO with written notice of 7 business days.
 7. Governing Law: Laws of India. Jurisdiction: Jharkhand High Court.
 
 This Purchase Order is issued electronically and is legally valid without physical signature.`}
