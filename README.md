@@ -130,6 +130,13 @@
     *   **KPI & Performance Metrics**: Real-time ratings and scorecards evaluating delivery, pricing, and quality.
     *   **Compliance Uploads**: Keep credentials active by uploading ISO Certificates or W-9 tax forms, automatically parsed for expiry dates.
 
+    ### 4. 🔔 Premium Real-Time Multi-Event Toast Notification System
+    *   **Animated Entries & Exits**: Premium sliding/fading card animations powered by **Framer Motion** for a sleek, high-end feel.
+    *   **Dynamic Styling & Categorization**: Context-aware color palettes, typography, and iconography representing Sourcing (RFQs, Bids), Orders (POs, GRNs), and Negotiations (Messages, counter-offers).
+    *   **Auto-Dismissal & Interactivity**: Automatically fades out in 5 seconds or allows click-to-dismiss. Hover states and transition cards are fully interactive.
+    *   **Intelligent Cross-Tab Synchronization**: Uses `localStorage` change tracking and browser `storage` events to broadcast and display alerts instantly across multiple open tabs or windows.
+    *   **One-Click Deep Linking**: Clicking a toast marks the notification as read in the database, and automatically routes the user directly to the Sourcing or Supplier Notifications page.
+
     ---
 
     ## ⚡ Client-Side PDF Parsing Engine

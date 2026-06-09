@@ -219,3 +219,15 @@ This is incorrect. The correct enterprise workflow implemented in the SRM Portal
 PO Generated ──> Goods Delivered ──> GRN Created ──> Supplier Generates Invoice Draft ──> Supplier Reviews & Submits ──> System Validates Invoice (3-Way Match) ──> Finance Approves Payment
 ```
 The SRM Portal acts as an Invoice Capture, Verification, and Validation System rather than a simple automatic invoice generator.
+
+---
+
+# Real-Time Multi-Event Toast Notification System
+
+To ensure all departments (Procurement, Warehouse, Finance, and Supplier Accounts) collaborate seamlessly, the SRM Portal implements a premium, animated, cross-tab **Real-Time Toast Notification System**.
+
+### Operational Mechanism & Cross-Tab Broadcasts
+1. **Event Capture**: When any user triggers a critical event (creating an RFQ, submitting a bid, sending a negotiation room message, responding to a counter-offer, or finalising a PO), a notification object is stored in the database and pre-pended to the local storage list `srm_notifications`.
+2. **Tab Communication**: The system dispatches the `srm_notifications_updated` event locally, and the browser automatically dispatches a `storage` event to all other open tabs/windows under the same origin.
+3. **Framer Motion Animations**: The `<ToastContainer />` component, integrated globally inside `DashboardLayout`, listens to these updates. When a new unread notification ID is detected, it renders a sliding, glassmorphic toast banner in the top-right corner.
+4. **Interaction & Routing**: The toast automatically fades out after 5 seconds or can be manually dismissed. Clicking on the toast marks the notification as read in local storage and deep-links the user directly to their respective Notifications page (`/admin/notifications` or `/supplier/notifications`).

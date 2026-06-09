@@ -9,6 +9,10 @@ Instead of exchanging fragmented emails, manually typing in data, and losing tra
 > **Isolated Multi-Account Testing (Tab Independence):**
 > The active user session is stored in `sessionStorage`, which is isolated per browser tab. This enables you to open the supplier portal in Tab A as one supplier, and log in to a second supplier account in Tab B, allowing you to test independent supplier behaviors simultaneously in the same browser window without session conflicts.
 
+> [!NOTE]
+> **Real-Time Cross-Tab Toast Notifications:**
+> The portal includes a premium real-time toast notification system using `localStorage` synchronization and the browser's `storage` events. When an action occurs in one tab (e.g., creating an RFQ or sending a negotiation message), all other open browser tabs/windows will immediately receive a sliding toast notification alert in real-time.
+
 ---
 
 ## Real-Life Department Mapping
@@ -60,6 +64,7 @@ Follow these steps sequentially to test the full Procurement Lifecycle.
   6. **UI Verification**: Confirm the modal expands to `xxl` (1280px wide) split-screen showing the PDF viewer on the right and form fields on the left.
   7. **Parser Verification**: Verify the parser extracts the Title, Category (`Logistics`), Deadline, and Target value.
   8. Click **Save RFQ** to write the record and its associated line items to the database with status `Active`.
+  9. **Toast Verification**: Confirm that upon saving, a purple-themed sourcing toast notification slides in from the top-right corner of the screen.
 
 ---
 
@@ -72,6 +77,7 @@ Follow these steps sequentially to test the full Procurement Lifecycle.
   4. Click the **Bid** action button next to the RFQ to route to **My Bids** and open the quotation sheet.
   5. Enter the **Unit Price** and **Tax (%)** for each line item. Verify that the line totals and overall subtotal, taxes, and grand totals automatically calculate.
   6. Click **Submit Proposal** to save the quote.
+  7. **Toast Verification**: Confirm a success toast slides in indicating that the bid proposal has been submitted.
 
 ---
 
@@ -82,13 +88,15 @@ Follow these steps sequentially to test the full Procurement Lifecycle.
      * In the **Admin Console**, go to **Bid Management** and select the RFQ.
      * Click **Negotiate** next to the supplier's quotation (routes to Negotiation Room).
      * Click **Propose Counter** and enter a revised total price (e.g. `90000` INR). Click **Submit Counter**.
-     * **Verification**: Confirm that the overall quote `grand_total` updates in the database and a round message is logged, but original quoted line items are preserved unmodified.
+     * **Verification & Toast**: Confirm that the overall quote `grand_total` updates. In the **Supplier Portal** tab, verify that a counter-offer toast immediately slides in.
   2. **Supplier Responds with Counter-Offer**:
      * Open the **Supplier Workspace** negotiation room. Confirm they see the Admin's counter-offer of ₹90,000.
      * Click **Counter-Propose** and submit a revised price of `95000` INR.
+     * **Toast Verification**: Verify that a revised counter-proposal toast notification triggers on the Admin Console tab.
   3. **Admin Accepts the Negotiated Price**:
      * Return to the Admin Console negotiation room.
      * The Admin sees the Supplier's counter-offer. Click **Accept Price** and confirm. The terms are locked.
+     * **Toast Verification**: Verify the Supplier tab receives an acceptance toast notification immediately.
 
 ---
 
@@ -96,8 +104,9 @@ Follow these steps sequentially to test the full Procurement Lifecycle.
 * **Actor**: Admin (Procurement Team)
 * **Actions**:
   1. Under the Bid Comparison screen, select the winning supplier bid and click **Award Contract**.
-  2. Navigate to **Purchase Orders** in the sidebar.
-  3. Verify the official legally binding PO has been generated with status `Issued`, recording the agreed final terms.
+  2. **Toast Verification**: Confirm that a PO generated/issued toast notification triggers.
+  3. Navigate to **Purchase Orders** in the sidebar.
+  4. Verify the official legally binding PO has been generated with status `Issued`, recording the agreed final terms.
 
 ---
 
