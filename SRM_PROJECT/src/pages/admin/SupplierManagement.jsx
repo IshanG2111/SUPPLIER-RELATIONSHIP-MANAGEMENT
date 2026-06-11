@@ -133,144 +133,155 @@ export function SupplierManagement() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-[calc(100vh-8.5rem)] min-h-0 overflow-hidden space-y-4">
       <PageHeader
         title="Supplier Hub"
         description="Monitor vendor qualification, performance metrics, compliance records, and dynamic risk flags across the procurement lifecycle."
       />
 
-      {/* KPI Stats Panel */}
-      <div className="grid gap-4 sm:grid-cols-4">
-        <Card className="p-5">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400">
-              <Users className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Suppliers</p>
-              <p className="text-2xl font-bold text-slate-950 dark:text-white mt-0.5">{totalCount}</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-5">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
-              <CheckCircle2 className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Approved Vendors</p>
-              <p className="text-2xl font-bold text-slate-950 dark:text-white mt-0.5">{approvedCount}</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-5">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
-              <AlertTriangle className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Watchlist Suppliers</p>
-              <p className="text-2xl font-bold text-slate-950 dark:text-white mt-0.5">{watchlistCount}</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-5">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400">
-              <AlertCircle className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Risk Suppliers</p>
-              <p className="text-2xl font-bold text-slate-950 dark:text-white mt-0.5">{riskCount}</p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Main Supplier Workbench Card */}
-      <Card>
-        <CardHeader 
-          title="Qualification & Performance Center" 
-          subtitle="Enterprise vendor evaluations and risk scorecard metrics"
-          action={
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <input
-                type="text"
-                placeholder="Search supplier or category..."
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                className="h-10 w-64 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 text-sm placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-brand-500"
-              />
-              <select
-                className="h-10 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 text-sm text-slate-800 dark:text-slate-200 outline-none"
-                value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
-              >
-                <option value="">All statuses</option>
-                <option value="Approved">Approved</option>
-                <option value="Watchlist">Watchlist</option>
-                <option value="Risk Supplier">Risk Supplier</option>
-              </select>
-            </div>
-          }
-        />
-
-        {loading ? (
-          <div className="flex h-48 items-center justify-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
-          </div>
-        ) : (
-          <DataTable
-            data={filteredSuppliers}
-            columns={[
-              { key: 'company_name', header: 'Supplier' },
-              { key: 'category', header: 'Category' },
-              { key: 'active_pos', header: 'Active POs', render: (row) => `${row.active_pos || 0} POs` },
-              { key: 'success_rate', header: 'Success Rate', render: (row) => `${row.success_rate || 100}%` },
-              { 
-                key: 'rating', 
-                header: 'Rating', 
-                render: (row) => (
-                  <span className="inline-flex items-center gap-1 font-semibold text-slate-950 dark:text-slate-50">
-                    <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
-                    {row.rating}
-                  </span>
-                )
-              },
-              {
-                key: 'performance_score',
-                header: 'Performance Score',
-                render: (row) => (
-                  <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-bold ring-1 ring-inset ${
-                    row.performance_score >= 90 
-                      ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' 
-                      : row.performance_score >= 80 
-                      ? 'bg-amber-50 text-amber-700 ring-amber-600/20' 
-                      : 'bg-rose-50 text-rose-700 ring-rose-600/20'
-                  }`}>
-                    {row.performance_score}% Score
-                  </span>
-                )
-              },
-              { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} /> },
-              {
-                key: 'actions',
-                header: 'Actions',
-                render: (row) => (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="h-8 px-3 py-0 text-xs font-semibold"
-                    onClick={() => setSelectedSupplier(row)}
-                  >
-                    <Eye className="h-3.5 w-3.5 mr-1" /> View Scorecard
-                  </Button>
-                )
-              }
-            ]}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0 overflow-hidden">
+        {/* Main Supplier Workbench Card */}
+        <Card className="lg:col-span-3 flex flex-col h-full min-h-0 overflow-hidden">
+          <CardHeader 
+            title="Qualification & Performance Center" 
+            subtitle="Enterprise vendor evaluations and risk scorecard metrics"
+            action={
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <input
+                  type="text"
+                  placeholder="Search supplier or category..."
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  className="h-9 w-48 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 px-3 text-xs placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-brand-500"
+                />
+                <select
+                  className="h-9 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 px-3 text-xs text-slate-800 dark:text-slate-200 outline-none"
+                  value={statusFilter}
+                  onChange={e => setStatusFilter(e.target.value)}
+                >
+                  <option value="">All statuses</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Watchlist">Watchlist</option>
+                  <option value="Risk Supplier">Risk Supplier</option>
+                </select>
+              </div>
+            }
           />
-        )}
-      </Card>
+
+          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+            {loading ? (
+              <div className="flex h-48 items-center justify-center">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+              </div>
+            ) : (
+              <DataTable
+                data={filteredSuppliers}
+                columns={[
+                  { key: 'company_name', header: 'Supplier' },
+                  { key: 'category', header: 'Category' },
+                  { key: 'active_pos', header: 'Active POs', render: (row) => `${row.active_pos || 0} POs` },
+                  { key: 'success_rate', header: 'Success Rate', render: (row) => `${row.success_rate || 100}%` },
+                  { 
+                    key: 'rating', 
+                    header: 'Rating', 
+                    render: (row) => (
+                      <span className="inline-flex items-center gap-1 font-semibold text-slate-950 dark:text-slate-50">
+                        <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                        {row.rating}
+                      </span>
+                    )
+                  },
+                  {
+                    key: 'performance_score',
+                    header: 'Performance Score',
+                    render: (row) => (
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-bold ring-1 ring-inset ${
+                        row.performance_score >= 90 
+                          ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' 
+                          : row.performance_score >= 80 
+                          ? 'bg-amber-50 text-amber-700 ring-amber-600/20' 
+                          : 'bg-rose-50 text-rose-700 ring-rose-600/20'
+                      }`}>
+                        {row.performance_score}% Score
+                      </span>
+                    )
+                  },
+                  { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} /> },
+                  {
+                    key: 'actions',
+                    header: 'Actions',
+                    render: (row) => (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="h-8 px-3 py-0 text-xs font-semibold"
+                        onClick={() => setSelectedSupplier(row)}
+                      >
+                        <Eye className="h-3.5 w-3.5 mr-1" /> View Scorecard
+                      </Button>
+                    )
+                  }
+                ]}
+              />
+            )}
+          </div>
+        </Card>
+
+        {/* Right Pane Bento Cards */}
+        <div className="flex flex-col gap-4 h-full overflow-y-auto custom-scrollbar pr-1">
+          {/* Stat Box 1 */}
+          <Card className="p-4 flex flex-col shrink-0 justify-center min-h-[90px]">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400">
+                <Users className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider">Total Suppliers</p>
+                <p className="text-xl font-bold text-slate-950 dark:text-white mt-0.5">{totalCount}</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Stat Box 2 */}
+          <Card className="p-4 flex flex-col shrink-0 justify-center min-h-[90px]">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
+                <CheckCircle2 className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider">Approved Vendors</p>
+                <p className="text-xl font-bold text-slate-950 dark:text-white mt-0.5">{approvedCount}</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Stat Box 3 */}
+          <Card className="p-4 flex flex-col shrink-0 justify-center min-h-[90px]">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
+                <AlertTriangle className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider">Watchlist</p>
+                <p className="text-xl font-bold text-slate-950 dark:text-white mt-0.5">{watchlistCount}</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Stat Box 4 */}
+          <Card className="p-4 flex flex-col shrink-0 justify-center min-h-[90px]">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400">
+                <AlertCircle className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider">Risk Flagged</p>
+                <p className="text-xl font-bold text-slate-950 dark:text-white mt-0.5">{riskCount}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
 
       {/* Supplier Scorecard Drawer */}
       {selectedSupplier && (
@@ -494,7 +505,7 @@ export function SupplierManagement() {
                 data={workflowData.rfqs}
                 columns={[
                   { key: 'id', header: 'RFQ Reference' },
-                  { key: 'title', header: 'RFQ Sourced' },
+                  { key: 'title', header: 'RFQ Sourced', nowrap: false },
                   { key: 'category', header: 'Category' },
                   { key: 'price', header: 'Quoted Price', render: (row) => currency(row.price) },
                   { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} /> }

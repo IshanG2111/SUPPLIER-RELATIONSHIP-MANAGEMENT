@@ -192,7 +192,7 @@ export function RFQManagement() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-[calc(100vh-8.5rem)] min-h-0 overflow-hidden space-y-4">
       <PageHeader
         title="RFQ Management"
         description="Create, publish, evaluate, and award sourcing events."
@@ -204,37 +204,112 @@ export function RFQManagement() {
         }
       />
 
-      <Card>
-        <CardHeader title="RFQ List" subtitle="Current sourcing events" />
-        <DataTable
-          data={rfqList}
-          columns={[
-            { key: 'id', header: 'RFQ' },
-            { key: 'title', header: 'Title', render: (row) => <Link className="font-semibold text-brand-700" to={`/admin/rfqs/${row.id}`}>{row.title}</Link> },
-            { key: 'category', header: 'Category' },
-            { key: 'deadline', header: 'Deadline' },
-            { key: 'bids', header: 'Bids' },
-            { key: 'value', header: 'Value', render: (row) => currency(row.value) },
-            { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} /> },
-            {
-              key: 'actions',
-              header: 'Actions',
-              render: (row) => (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="h-9 px-2 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
-                  onClick={() => handleDelete(row.id)}
-                  aria-label={`Delete ${row.id}`}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0 overflow-hidden">
+        {/* RFQ List Bento Box */}
+        <Card className="lg:col-span-2 flex flex-col h-full min-h-0 overflow-hidden">
+          <CardHeader title="RFQ List" subtitle="Current sourcing events" />
+          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+            <DataTable
+              data={rfqList}
+              columns={[
+                { key: 'id', header: 'RFQ' },
+                { key: 'title', header: 'Title', nowrap: false, render: (row) => <Link className="font-semibold text-brand-700 dark:text-brand-400" to={`/admin/rfqs/${row.id}`}>{row.title}</Link> },
+                { key: 'category', header: 'Category' },
+                { key: 'deadline', header: 'Deadline' },
+                { key: 'bids', header: 'Bids' },
+                { key: 'value', header: 'Value', render: (row) => currency(row.value) },
+                { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} /> },
+                {
+                  key: 'actions',
+                  header: 'Actions',
+                  render: (row) => (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="h-9 px-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-700"
+                      onClick={() => handleDelete(row.id)}
+                      aria-label={`Delete ${row.id}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </Button>
+                  ),
+                },
+              ]}
+            />
+          </div>
+        </Card>
+
+        {/* Side Panel Bento boxes */}
+        <div className="flex flex-col gap-6 h-full overflow-y-auto custom-scrollbar pr-1">
+          {/* Bento Card 1: AI Specification Upload */}
+          <Card className="p-5 flex flex-col shrink-0">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">AI Specification Auto-fill</h3>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-4 leading-normal">
+              Upload a procurement spec PDF to auto-fill sourcing parameters and line items.
+            </p>
+            
+            <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-4 text-center transition hover:bg-slate-100/50 dark:hover:bg-slate-900/40">
+              <div className="flex flex-col items-center justify-center">
+                <div className="rounded-full bg-blue-50 dark:bg-blue-950/40 p-2.5 text-blue-600 dark:text-blue-400 mb-2">
+                  <UploadCloud className={`h-5 w-5 ${isParsing ? 'animate-bounce' : ''}`} />
+                </div>
+                
+                <input
+                  type="file"
+                  accept=".pdf"
+                  id="rfq-bento-pdf-upload"
+                  className="hidden"
+                  onChange={handlePdfUpload}
+                  disabled={isParsing}
+                />
+                <label
+                  htmlFor="rfq-bento-pdf-upload"
+                  className="cursor-pointer inline-flex items-center gap-2 rounded-lg bg-brand-600 hover:bg-brand-500 dark:bg-brand-500 dark:hover:bg-brand-400 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition duration-150 mb-2"
                 >
-                  <Trash2 className="h-4 w-4" />
-                  Delete
-                </Button>
-              ),
-            },
-          ]}
-        />
-      </Card>
+                  Choose PDF File
+                </label>
+
+                <div className="flex flex-col items-center gap-1 text-[10px] text-slate-400">
+                  <span>Or download a template:</span>
+                  <a 
+                    href={`${import.meta.env.BASE_URL || '/'}samples/rfq-procurement-spec.pdf`} 
+                    download 
+                    className="text-brand-600 dark:text-brand-400 hover:underline font-semibold"
+                  >
+                    Sample RFQ Spec.pdf
+                  </a>
+                </div>
+                
+                {isParsing && (
+                  <p className="mt-3 text-[11px] font-semibold text-blue-600 dark:text-blue-400 animate-pulse flex items-center gap-1">
+                    Extracting specs...
+                  </p>
+                )}
+              </div>
+            </div>
+          </Card>
+
+          {/* Bento Card 2: Sourcing Analytics */}
+          <Card className="p-5 flex flex-col shrink-0">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">Sourcing Overview</h3>
+            <div className="grid grid-cols-2 gap-3 text-center">
+              <div className="bg-slate-50 dark:bg-[#0f172a]/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800/80">
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Active Events</span>
+                <span className="text-lg font-bold text-slate-850 dark:text-slate-200 mt-1 block">
+                  {rfqList.filter(r => r.status === 'Active' || r.status === 'Under Evaluation').length}
+                </span>
+              </div>
+              <div className="bg-slate-50 dark:bg-[#0f172a]/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800/80">
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Target Value</span>
+                <span className="text-sm font-bold text-brand-600 dark:text-brand-400 mt-2 block truncate">
+                  {currency(rfqList.reduce((acc, curr) => acc + (curr.value || 0), 0))}
+                </span>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
 
       <Modal title="Create RFQ" isOpen={createRfq.isOpen} onClose={resetAndClose} size="lg">
         <div className="grid gap-6">

@@ -279,21 +279,21 @@ export function BidComparison() {
   }
 
   return (
-    <>
+    <div className="flex flex-col h-[calc(100vh-8.5rem)] min-h-0 overflow-hidden space-y-4">
       <PageHeader 
         title="Bid Comparison" 
         description="Compare quotations by price, timeline, rating, warranty, and weighted evaluation score." 
         action={
           rfqList.length > 0 && (
-            <div className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 shadow-sm min-w-[280px]">
+            <div className="flex items-center gap-3 bg-white dark:bg-[#090f1e]/80 border border-slate-200 dark:border-[#1e293b]/60 rounded-xl px-4 py-2 shadow-sm min-w-[280px]">
               <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0">RFQ Scope:</span>
               <select 
-                className="flex-1 bg-transparent text-xs font-semibold text-slate-800 dark:text-slate-200 border-none outline-none focus:ring-0 cursor-pointer"
+                className="flex-1 bg-transparent text-xs font-semibold text-slate-800 dark:text-slate-200 border-none outline-none focus:ring-0 cursor-pointer h-9"
                 value={selectedRfqId}
                 onChange={(e) => setSelectedRfqId(e.target.value)}
               >
                 {rfqList.map((r) => (
-                  <option key={r.id} value={r.id} className="dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                  <option key={r.id} value={r.id} className="dark:bg-[#090f1e] text-slate-800 dark:text-slate-200">
                     {r.id} - {r.title.substring(0, 30)}{r.title.length > 30 ? '...' : ''}
                   </option>
                 ))}
@@ -302,17 +302,69 @@ export function BidComparison() {
           )
         }
       />
-      <Card>
-        <CardHeader 
-          title={`${selectedRfqId} Bid Matrix`} 
-          subtitle={selectedRfq ? selectedRfq.title : "Best quotation is highlighted for award review"} 
-        />
-        <DataTable
-          data={filteredBids}
-          empty="No supplier quotations have been submitted yet for this RFQ."
-          columns={comparisonColumns}
-        />
-      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0 overflow-hidden">
+        {/* Bid Comparison Bento Box */}
+        <Card className="lg:col-span-3 flex flex-col h-full min-h-0 overflow-hidden">
+          <CardHeader 
+            title={`${selectedRfqId} Bid Matrix`} 
+            subtitle={selectedRfq ? selectedRfq.title : "Best quotation is highlighted for award review"} 
+          />
+          <div className="flex-1 overflow-auto custom-scrollbar min-h-0">
+            <DataTable
+              data={filteredBids}
+              empty="No supplier quotations have been submitted yet for this RFQ."
+              columns={comparisonColumns}
+            />
+          </div>
+        </Card>
+
+        {/* Side Panel Bento boxes */}
+        <div className="flex flex-col gap-6 h-full overflow-y-auto custom-scrollbar pr-1">
+          {/* RFQ Details Card */}
+          <Card className="p-5 flex flex-col shrink-0">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">RFQ Sourcing Scope</h3>
+            {selectedRfqDetails ? (
+              <div className="space-y-3 text-xs">
+                <div>
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Title</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-250 leading-relaxed block">{selectedRfqDetails.title}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Category</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block">{selectedRfqDetails.category}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Deadline</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block">{selectedRfqDetails.deadline}</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Target Value</span>
+                    <span className="font-bold text-brand-600 dark:text-brand-400 mt-0.5 block">{currency(selectedRfqDetails.value || 0)}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Quotes Received</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 mt-0.5 block">{filteredBids.length} proposals</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <span className="text-xs text-slate-400 italic">No RFQ details loaded.</span>
+            )}
+          </Card>
+
+          {/* Quick Guidelines Card */}
+          <Card className="p-5 flex flex-col shrink-0">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-2">Award Guidance</h3>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal">
+              Compare bidder metrics including unit pricing, delivery schedules, and system scorecards. Clicking "Award" issues the binding Purchase Order automatically.
+            </p>
+          </Card>
+        </div>
+      </div>
 
       {showConfirmModal && awardingBid && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
@@ -405,6 +457,6 @@ This Purchase Order is issued electronically and is legally valid without physic
         title={customAlert.title}
         message={customAlert.message}
       />
-    </>
+    </div>
   );
 }

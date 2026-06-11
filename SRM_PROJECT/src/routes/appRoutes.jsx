@@ -27,7 +27,7 @@ import { Notifications } from '../pages/supplier/Notifications.jsx';
 import { NegotiationRoom } from '../pages/NegotiationRoom.jsx';
 import { NotFound } from '../pages/NotFound.jsx';
 import { RootRedirect } from '../components/RootRedirect.jsx';
-import { PrivacyPolicy } from '../pages/PrivacyPolicy.jsx';
+
 
 export const appRoutes = [
   {
@@ -38,7 +38,7 @@ export const appRoutes = [
       { path: '/login', element: <LoginPage /> },
       { path: '/register', element: <RegisterPage /> },
       { path: '/forgot-password', element: <ForgotPassword /> },
-      { path: '/privacy', element: <PrivacyPolicy /> },
+
     ],
   },
   {

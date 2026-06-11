@@ -43,8 +43,12 @@ export function Navbar({ title, onMenu }) {
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 
+  const navbarClasses = isAdmin
+    ? 'dark:bg-slate-950/90 dark:border-blue-900/35 dark:shadow-[0_4px_20px_rgba(37,99,235,0.04)]'
+    : 'dark:bg-slate-950/90 dark:border-emerald-900/35 dark:shadow-[0_4px_20px_rgba(16,185,129,0.03)]';
+
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 shadow-[0_1px_12px_rgba(15,23,42,0.05)] backdrop-blur sm:px-6 dark:bg-slate-950/95 dark:border-slate-800/80 dark:shadow-[0_1px_12px_rgba(0,0,0,0.3)]">
+    <header className={`sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 shadow-[0_1px_12px_rgba(15,23,42,0.05)] backdrop-blur sm:px-6 ${navbarClasses}`}>
       <div className="flex items-center gap-3">
         <Button variant="ghost" className="h-9 w-9 p-0 lg:hidden dark:text-slate-300 dark:hover:bg-slate-800" onClick={onMenu} aria-label="Open menu">
           <Menu className="h-5 w-5" />
@@ -68,11 +72,7 @@ export function Navbar({ title, onMenu }) {
         
         <ThemeToggle />
 
-        <Link to="/privacy" title="Privacy Policy & Registry">
-          <Button variant="ghost" className="h-11 w-11 p-0 dark:text-slate-300 dark:hover:bg-slate-800">
-            <ShieldCheck className="h-5 w-5" />
-          </Button>
-        </Link>
+
 
         <Link to={notificationsLink} className="relative" title="Notifications">
           <Button variant="ghost" className="h-11 w-11 p-0 dark:text-slate-300 dark:hover:bg-slate-800" aria-label="Notifications">

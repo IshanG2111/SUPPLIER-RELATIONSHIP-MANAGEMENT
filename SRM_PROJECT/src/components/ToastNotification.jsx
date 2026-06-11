@@ -127,10 +127,11 @@ export function ToastContainer() {
             <motion.div
               key={toast.id}
               layout
-              initial={{ opacity: 0, x: 50, scale: 0.9 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 50, scale: 0.9, transition: { duration: 0.2 } }}
-              className="pointer-events-auto w-full relative rounded-2xl bg-white/90 dark:bg-slate-900/95 backdrop-blur-md border border-slate-250/50 dark:border-slate-800/80 p-4 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-[0_15px_35px_-5px_rgba(0,0,0,0.35)] flex gap-3 cursor-pointer group hover:border-brand-500/50 dark:hover:border-brand-500/40 transition-colors duration-200"
+              initial={{ opacity: 0, y: 15, scale: 0.9, x: 20 }}
+              animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.85, x: 30, transition: { duration: 0.18 } }}
+              transition={{ type: "spring", stiffness: 350, damping: 25 }}
+              className="pointer-events-auto w-full relative rounded-2xl bg-white/75 dark:bg-slate-900/75 backdrop-blur-xl border border-white/20 dark:border-slate-800/60 p-4 shadow-[0_12px_40px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_-4px_rgba(0,0,0,0.4)] flex gap-3 cursor-pointer group hover:border-brand-500/60 dark:hover:border-brand-500/50 transition-all duration-200 overflow-hidden"
               onClick={() => handleToastClick(toast)}
             >
               {/* Icon Container */}
@@ -163,7 +164,7 @@ export function ToastContainer() {
                   e.stopPropagation();
                   removeToast(toast.id);
                 }}
-                className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:text-slate-550 dark:hover:text-slate-300 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors pointer-events-auto"
+                className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:text-slate-550 dark:hover:text-slate-300 p-1 rounded-md hover:bg-slate-100/50 dark:hover:bg-slate-800/80 transition-colors pointer-events-auto"
                 aria-label="Dismiss toast"
               >
                 <X className="h-4 w-4" />
@@ -187,5 +188,14 @@ function ToastTimer({ duration, onDismiss }) {
     return () => clearTimeout(timer);
   }, [duration, onDismiss]);
 
-  return null;
+  return (
+    <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-150/40 dark:bg-slate-800/30 overflow-hidden">
+      <motion.div
+        initial={{ width: '100%' }}
+        animate={{ width: '0%' }}
+        transition={{ duration: duration / 1000, ease: 'linear' }}
+        className="h-full bg-gradient-to-r from-brand-500 to-indigo-500 dark:from-brand-400 dark:to-indigo-400"
+      />
+    </div>
+  );
 }
