@@ -1,4 +1,4 @@
-import { Check, CreditCard, Ban, CheckCircle, AlertTriangle, FileCheck, ArrowRight, CornerUpLeft, Eye, Download } from 'lucide-react';
+import { Check, CreditCard, Ban, CheckCircle, AlertTriangle, FileCheck, ArrowRight, CornerUpLeft, Eye, Download, Star, Loader2 } from 'lucide-react';
 import { Card, CardHeader } from '../../components/Card.jsx';
 import { DataTable } from '../../components/DataTable.jsx';
 import { PageHeader } from '../../components/PageHeader.jsx';
@@ -6,7 +6,7 @@ import { StatusBadge } from '../../components/StatusBadge.jsx';
 import { Button } from '../../components/Button.jsx';
 import { Modal } from '../../components/Modal.jsx';
 import { currency } from '../../utils/formatters.js';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 const mockInvoices = [
   { id: 'INV-5401', po: 'PO-88021', amount: 218000, submitted: '2026-05-20', due: '2026-06-04', status: 'Submitted', quantity: 2500 },
@@ -25,6 +25,25 @@ export function AdminInvoices() {
   const [poList, setPoList] = useState([]);
   const [grnList, setGrnList] = useState([]);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+
+  // Direct supplier rating/review states
+  const [selectedPoDetails, setSelectedPoDetails] = useState(null);
+  const [formReviewText, setFormReviewText] = useState('');
+  const [formRatingQuality, setFormRatingQuality] = useState(5);
+  const [formRatingPrice, setFormRatingPrice] = useState(5);
+  const [formRatingDelivery, setFormRatingDelivery] = useState(5);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState('');
+  const [submitError, setSubmitError] = useState('');
+
+  const currentUser = useMemo(() => {
+    try {
+      const stored = sessionStorage.getItem('srm_user');
+      return stored ? JSON.parse(stored) : { id: 1, fullName: 'Admin User' };
+    } catch {
+      return { id: 1, fullName: 'Admin User' };
+    }
+  }, []);
 
   const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1/SUPPLIER-RELATIONSHIP-MANAGEMENT/SRM_PROJECT/backend/api').replace(/\/$/, '');
 
@@ -93,10 +112,173 @@ export function AdminInvoices() {
       .then((data) => {
         if (data.success) {
           fetchInvoices(); // Refresh from backend to ensure data integrity
+          
+          // Also fetch PO details in case it was paid
+          if (newStatus === 'Paid') {
+            const matchedPo = poList.find(p => p.po_number === invoice.po);
+            if (matchedPo) {
+              fetch(`${apiBaseUrl}/purchase_orders.php?id=${matchedPo.id}`)
+                .then(res => res.json())
+                .then(data => {
+                  if (data.success && data.po) {
+                    setSelectedPoDetails(data.po);
+                  }
+                });
+            }
+          }
         }
       })
       .catch((err) => console.error('Failed to update invoice status:', err));
   };
+
+  const handleSelectInvoice = (row) => {
+    setSelectedInvoice(row);
+    setSelectedPoDetails(null);
+    setFormReviewText('');
+    setFormRatingQuality(5);
+    setFormRatingPrice(5);
+    setFormRatingDelivery(5);
+    setSubmitSuccess('');
+    setSubmitError('');
+    
+    // Find matching PO
+    const matchedPo = poList.find(p => p.po_number === row.po);
+    if (matchedPo) {
+      fetch(`${apiBaseUrl}/purchase_orders.php?id=${matchedPo.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.po) {
+            setSelectedPoDetails(data.po);
+          }
+        })
+        .catch(err => console.error('Failed to fetch PO details:', err));
+    }
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!selectedPoDetails) return;
+    setSubmitLoading(true);
+    setSubmitError('');
+    setSubmitSuccess('');
+
+    const targetSupplierId = selectedPoDetails.db_supplier_id || 1;
+
+    const payload = {
+      supplier_id: targetSupplierId,
+      po_id: selectedPoDetails.id,
+      review: formReviewText,
+      reviewed_by: currentUser.id,
+      rating_quality: formRatingQuality,
+      rating_price: formRatingPrice,
+      rating_delivery: formRatingDelivery
+    };
+
+    try {
+      const res = await fetch(`${apiBaseUrl}/ratings.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(r => r.json());
+
+      if (res.success) {
+        // Update PO status to fulfilled
+        await fetch(`${apiBaseUrl}/purchase_orders.php`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: selectedPoDetails.id,
+            status: 'fulfilled'
+          })
+        });
+
+        // Post order tracking event
+        await fetch(`${apiBaseUrl}/order-tracking.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            po_id: selectedPoDetails.id,
+            status: 'FULFILLED',
+            description: `Supplier evaluation submitted via Invoice Workbench. Sourcing workflow completed.`,
+            updated_by: currentUser.id
+          })
+        });
+
+        // Audit log
+        await fetch(`${apiBaseUrl}/audit-logs.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'PO_FULFILLED',
+            details: `PO ${selectedPoDetails.po_number} marked as fulfilled after review submission.`,
+            user_id: currentUser.id
+          })
+        }).catch(() => {});
+
+        setSubmitSuccess('Thank you! Evaluation successfully recorded and PO has been marked as Fulfilled.');
+        
+        // Refresh PO details
+        const updatedPoRes = await fetch(`${apiBaseUrl}/purchase_orders.php?id=${selectedPoDetails.id}`).then(r => r.json());
+        if (updatedPoRes.success && updatedPoRes.po) {
+          setSelectedPoDetails(updatedPoRes.po);
+        }
+        
+        // Refresh master lists
+        fetchPos();
+      } else {
+        setSubmitError(res.message || 'Failed to submit rating.');
+      }
+    } catch (err) {
+      console.error(err);
+      setSubmitError('Connection to rating service failed.');
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  // Interactive Star Rating helper
+  function StarInput({ label, rating, onChange }) {
+    return (
+      <div className="space-y-1">
+        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">{label}</label>
+        <div className="flex items-center gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => onChange(star)}
+              className="cursor-pointer hover:scale-110 transition-transform focus:outline-none"
+            >
+              <Star
+                className={`h-4 w-4 ${
+                  star <= rating
+                    ? 'fill-amber-500 stroke-amber-500'
+                    : 'fill-transparent stroke-slate-300 dark:stroke-slate-700'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function StarDisplay({ rating, size = "h-4 w-4" }) {
+    return (
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`${size} ${
+              star <= rating
+                ? 'fill-amber-500 stroke-amber-500'
+                : 'fill-transparent stroke-slate-300 dark:stroke-slate-700'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  }
 
   const outstanding = invoicesList
     .filter((x) => x.status === 'Submitted' || x.status === 'Under Review' || x.status === 'Rejected' || x.status === 'Payment Processing')
@@ -225,7 +407,7 @@ export function AdminInvoices() {
                   type="button"
                   variant="secondary"
                   className="h-8 px-3 py-0 text-xs font-semibold border-brand-200 hover:bg-brand-50 text-brand-700 dark:border-slate-800 dark:hover:bg-slate-900"
-                  onClick={() => setSelectedInvoice(row)}
+                  onClick={() => handleSelectInvoice(row)}
                 >
                   Review Match
                 </Button>
@@ -421,6 +603,86 @@ export function AdminInvoices() {
                 )}
               </div>
             </div>
+
+            {/* Supplier Rating / Review section if Paid */}
+            {selectedInvoice.status === 'Paid' && (
+              <div className="border-t border-slate-100 dark:border-slate-800 pt-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Supplier Performance Review</h4>
+                </div>
+
+                {!selectedPoDetails ? (
+                  <div className="flex items-center gap-2 text-xs text-slate-500 italic animate-pulse">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Loading PO review details...</span>
+                  </div>
+                ) : selectedPoDetails.review ? (
+                  <div className="space-y-3 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <span className="font-semibold text-slate-500">Evaluation Submitted</span>
+                      <div className="flex items-center gap-1">
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">Overall:</span>
+                        <StarDisplay rating={selectedPoDetails.review.rating} size="h-3.5 w-3.5" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-950 p-3 rounded italic border border-slate-100 dark:border-slate-900">
+                      "{selectedPoDetails.review.review}"
+                    </p>
+                    <div className="flex gap-4 text-[10px] font-bold text-slate-500 pt-1">
+                      <span>Quality: <span className="text-amber-600 dark:text-amber-400">{selectedPoDetails.review.rating_quality}/5 ⭐</span></span>
+                      <span>Price/Value: <span className="text-amber-600 dark:text-amber-400">{selectedPoDetails.review.rating_price}/5 ⭐</span></span>
+                      <span>Delivery: <span className="text-amber-600 dark:text-amber-400">{selectedPoDetails.review.rating_delivery}/5 ⭐</span></span>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmitReview} className="space-y-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      This purchase order is fully paid. Please rate the supplier's performance directly below to complete the procurement cycle.
+                    </p>
+
+                    {submitSuccess && (
+                      <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs rounded-lg flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 flex-shrink-0 text-emerald-600" />
+                        <span>{submitSuccess}</span>
+                      </div>
+                    )}
+
+                    {submitError && (
+                      <div className="p-2.5 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/50 text-rose-700 dark:text-rose-400 text-xs rounded-lg flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 flex-shrink-0 text-rose-600" />
+                        <span>{submitError}</span>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <StarInput label="Quality" rating={formRatingQuality} onChange={setFormRatingQuality} />
+                      <StarInput label="Price/Value" rating={formRatingPrice} onChange={setFormRatingPrice} />
+                      <StarInput label="Delivery Speed" rating={formRatingDelivery} onChange={setFormRatingDelivery} />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Performance Notes</label>
+                      <textarea
+                        value={formReviewText}
+                        onChange={(e) => setFormReviewText(e.target.value)}
+                        placeholder="Describe delivery compliance, packaging quality, etc..."
+                        className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-brand-500 text-slate-800 dark:text-slate-100 h-16"
+                        required
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={submitLoading}
+                      className="w-full bg-slate-900 dark:bg-white dark:text-slate-900 text-xs py-2 font-bold hover:bg-slate-800 dark:hover:bg-slate-100"
+                    >
+                      {submitLoading ? 'Submitting Evaluation...' : 'Submit Supplier Rating'}
+                    </Button>
+                  </form>
+                )}
+              </div>
+            )}
 
             {/* PDF View/Download Actions and Close */}
             <div className="border-t border-slate-100 dark:border-slate-800 pt-4 flex justify-between items-center">
