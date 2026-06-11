@@ -259,16 +259,18 @@ SRM_PROJECT/
 
 ### 1. Database Setup
 
+Ensure MySQL/Apache is running (e.g., via XAMPP). Set up the database schema and apply all required migrations:
+
 ```bash
-# Option A: Import via phpMyAdmin or MySQL CLI
+# Step A: Create the base database schema and seed initial tables
 mysql -u root < SRM_PROJECT/backend/database/schema.sql
 
-# Option B: Run migrations on an existing database
+# Step B: Run all incremental migrations to update tables and seed mock supplier profiles/evaluations
 cd SRM_PROJECT/backend/database
-php migrate.php
+php migrate_all.php
 ```
 
-This creates the `srm_portal` database and seeds initial testing records.
+This creates the `srm_portal` database, establishes InnoDB constraints, applies necessary columns for PO tracking/3-way matching, and seeds the 16 mock supplier partner accounts along with their default performance evaluations.
 
 ### 2. Environment Configuration
 
