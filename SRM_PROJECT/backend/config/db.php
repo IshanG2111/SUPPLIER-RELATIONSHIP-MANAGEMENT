@@ -9,6 +9,7 @@ function db_config(): array
         'user' => getenv('DB_USER') ?: 'root',
         'pass' => getenv('DB_PASS') ?: '',
         'name' => getenv('DB_NAME') ?: 'srm_portal',
+        'port' => getenv('DB_PORT') ? (int)getenv('DB_PORT') : 3306,
     ];
 }
 
@@ -19,7 +20,8 @@ function db_connection(): mysqli
         $config['host'],
         $config['user'],
         $config['pass'],
-        $config['name']
+        $config['name'],
+        $config['port']
     );
 
     if ($connection->connect_error) {
@@ -45,7 +47,8 @@ function db_try_connection(): ?mysqli
             $config['host'],
             $config['user'],
             $config['pass'],
-            $config['name']
+            $config['name'],
+            $config['port']
         );
         if ($connection->connect_error) {
             return null;
@@ -56,4 +59,5 @@ function db_try_connection(): ?mysqli
         return null;
     }
 }
+
 
