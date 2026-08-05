@@ -62,6 +62,9 @@ function db_connection(): mysqli
     if ($connection === false) {
         http_response_code(500);
         header('Content-Type: application/json');
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
         echo json_encode([
             'success' => false,
             'message' => 'Database initialization failed.',
@@ -93,6 +96,9 @@ function db_connection(): mysqli
     if (!$connected || $connection->connect_error) {
         http_response_code(500);
         header('Content-Type: application/json');
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
         echo json_encode([
             'success' => false,
             'message' => 'Database connection failed: ' . ($connection->connect_error ?? 'Unable to connect'),
