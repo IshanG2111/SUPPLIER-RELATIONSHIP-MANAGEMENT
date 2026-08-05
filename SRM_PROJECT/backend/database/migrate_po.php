@@ -53,7 +53,7 @@ addColumnIfNeeded($connection, 'purchase_orders', 'issued_to_supplier', "TINYINT
 $fkRfqRes = $connection->query("
     SELECT CONSTRAINT_NAME 
     FROM information_schema.KEY_COLUMN_USAGE 
-    WHERE TABLE_SCHEMA = 'srm_portal' 
+    WHERE TABLE_SCHEMA = DATABASE() 
       AND TABLE_NAME = 'purchase_orders' 
       AND COLUMN_NAME = 'rfq_id' 
       AND REFERENCED_TABLE_NAME = 'rfqs'
@@ -69,7 +69,7 @@ if ($fkRfqRes->num_rows === 0) {
 $fkSupplierRes = $connection->query("
     SELECT CONSTRAINT_NAME 
     FROM information_schema.KEY_COLUMN_USAGE 
-    WHERE TABLE_SCHEMA = 'srm_portal' 
+    WHERE TABLE_SCHEMA = DATABASE() 
       AND TABLE_NAME = 'purchase_orders' 
       AND COLUMN_NAME = 'supplier_id' 
       AND REFERENCED_TABLE_NAME = 'users'
