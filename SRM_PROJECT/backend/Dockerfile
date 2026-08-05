@@ -4,8 +4,8 @@ FROM php:8.2-apache
 # Install and enable the MySQLi extension (required for database connectivity)
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
-# Enable Apache rewrite module (useful if you ever implement routing rules)
-RUN a2enmod rewrite
+# Enable Apache rewrite and headers modules for CORS and URL routing
+RUN a2enmod rewrite headers
 
 # Copy the backend files from the current folder into Apache's default HTML folder
 COPY . /var/www/html/
