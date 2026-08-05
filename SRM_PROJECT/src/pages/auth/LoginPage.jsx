@@ -6,6 +6,7 @@ import { GlobeGraphic, SupplierGraphic, AdminGraphic } from './AnimatedAuthSVGs'
 import { GridBackground } from '../../components/ui/GridBackground';
 import { HoverBorderGradient } from '../../components/ui/HoverBorderGradient';
 import ThemeToggle from '../../../Theme.jsx';
+import { getApiBaseUrl } from '../../utils/apiBase';
 import './LoginPage.css';
 
 const supplierCardTheme = {
@@ -107,7 +108,7 @@ const Feature = ({ icon, title, sub, theme }) => (
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1/SUPPLIER-RELATIONSHIP-MANAGEMENT/SRM_PROJECT/backend/api').replace(/\/$/, '');
+  const apiBaseUrl = getApiBaseUrl();
   const [email, setEmail] = useState(() => localStorage.getItem('remembered_email') || '');
   const [password, setPassword] = useState(() => localStorage.getItem('remembered_password') || '');
   const [role, setRole] = useState(() => localStorage.getItem('remembered_role') || null);

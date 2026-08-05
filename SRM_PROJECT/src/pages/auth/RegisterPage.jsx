@@ -5,6 +5,7 @@ import { Truck, Shield, ArrowRight, ArrowLeft, Eye, ShieldCheck, Network, BarCha
 import { GlobeGraphic } from './AnimatedAuthSVGs';
 import { GridBackground } from '../../components/ui/GridBackground';
 import ThemeToggle from '../../../Theme.jsx';
+import { getApiBaseUrl } from '../../utils/apiBase';
 import './LoginPage.css';
 
 function LoaderDots() {
@@ -32,7 +33,7 @@ function LoaderDots() {
 export function RegisterPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1/SUPPLIER-RELATIONSHIP-MANAGEMENT/SRM_PROJECT/backend/api').replace(/\/$/, '');
+  const apiBaseUrl = getApiBaseUrl();
   const [role, setRole] = useState(searchParams.get('role') || 'supplier');
   const [currentStep, setCurrentStep] = useState(0);
   const [fullName, setFullName] = useState('');
