@@ -7,6 +7,9 @@ RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 # Enable Apache rewrite and headers modules for CORS and URL routing
 RUN a2enmod rewrite headers
 
+# Allow .htaccess overrides in Apache
+RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+
 # Copy the backend files from the current folder into Apache's default HTML folder
 COPY . /var/www/html/
 

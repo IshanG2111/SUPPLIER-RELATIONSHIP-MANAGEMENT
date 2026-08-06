@@ -49,6 +49,14 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 $connection = db_connection();
 $stmt = $connection->prepare('SELECT id, full_name, role, password_hash, company_name FROM users WHERE email = ? LIMIT 1');
+if (!$stmt) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database query error: ' . $connection->error,
+    ]);
+    exit;
+}
 $stmt->bind_param('s', $email);
 $stmt->execute();
 $result = $stmt->get_result();
