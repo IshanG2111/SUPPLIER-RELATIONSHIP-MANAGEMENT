@@ -41,6 +41,36 @@ function db_config(): array
 {
     load_env_file();
 
+    $dbUrl = getenv('DATABASE_URL') ?: getenv('MYSQL_URL');
+    if (!empty($dbUrl)) {
+        $parsed = parse_url($dbUrl);
+        if ($parsed !== false) {
+            $host = $parsed['host'] ?? '127.0.0.1';
+            $user = $parsed['user'] ?? 'root';
+            $pass = $parsed['pass'] ?? '';
+            $port = isset($parsed['port']) ? (int)$parsed['port'] : 3306;
+            $name = isset($parsed['path']) ? ltrim($parsed['path'], '/') : 'srm_portal';
+
+            $query = $parsed['query'] ?? '';
+            parse_str($query, $queryParams);
+            $sslMode = $queryParams['ssl-mode'] ?? $queryParams['sslmode'] ?? getenv('DB_SSL');
+            $useSsl = (
+                strcasecmp((string)$sslMode, 'REQUIRED') === 0 ||
+                $sslMode === 'true' ||
+                $sslMode === '1'
+            );
+
+            return [
+                'host' => $host,
+                'user' => $user,
+                'pass' => $pass,
+                'name' => $name,
+                'port' => $port,
+                'ssl'  => $useSsl,
+            ];
+        }
+    }
+
     $sslEnv = getenv('DB_SSL');
     $useSsl = ($sslEnv === 'true' || $sslEnv === '1' || strtolower((string)$sslEnv) === 'required');
 
